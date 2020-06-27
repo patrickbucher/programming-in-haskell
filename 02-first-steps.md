@@ -204,14 +204,14 @@ for example, `last [1,2,3,4,5] = 5`. Show how the function `last` could be
 defined in terms of the other library functions introduced in this chapter. Can
 you think of another possible definition?
 
-    last [xs] = head (reverse xs)
+    last xs = head (reverse xs)
 
-    last [xs] = head (drop ((length xs) - 1) xs)
+    last xs = head (drop ((length xs) - 1) xs)
 
 Ex. 5) The library function `init` removes the last element from a non-emtpy list;
 for example, `init [1,2,3,4,5] = [1,2,3,4]`. Show how `init` could similarly be
 defined in two different ways.
 
-    init [xs] = reverse (tail (reverse xs))
+    init xs = reverse (tail (reverse xs))
 
-    init [xs] = take (length xs - 1) xs
+    init xs = take (length xs - 1) xs
