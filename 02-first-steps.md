@@ -61,16 +61,16 @@ automatically:
 
 Some basic commands of GHCi are:
 
-| Command           | Meaning                   |
-|-------------------|---------------------------|
-| `:load name`      | load a file with `name`   |
-| `:reload`         | reload the current script |
-| `:set editor name | set editor to `name`      |
-| `:edit name`      | edit file with `name`     |
-| `:edit`           | edit current script       |
-| `:type expr`      | show the type of `expr`   |
-| `:?`              | list all commands         |
-| `quit`            | quit GHCi                 |
+| Command            | Meaning                   |
+|--------------------|---------------------------|
+| `:load name`       | load a file with `name`   |
+| `:reload`          | reload the current script |
+| `:set editor name` | set editor to `name`      |
+| `:edit name`       | edit file with `name`     |
+| `:edit`            | edit current script       |
+| `:type expr`       | show the type of `expr`   |
+| `:?`               | list all commands         |
+| `:quit`            | quit GHCi                 |
 
 ## Prelude Functions
 
