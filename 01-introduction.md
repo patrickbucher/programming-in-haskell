@@ -115,7 +115,7 @@ The `bigger` elements are put to the left, the `smaller` elements to the right s
                         smaller = [a | a <- xs, a <= x]
                         bigger  = [b | b <- xs, b > x]
 
-5) Whjat would be the effect of replacing <= by < in the original definition of
+5) What would be the effect of replacing <= by < in the original definition of
 `qsort`? Hint: consider the example `qsort [2,2,3,1,1]`.
 
 Elements equal to the first element would be omitted. The result would be a
