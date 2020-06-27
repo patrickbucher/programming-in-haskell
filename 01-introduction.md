@@ -64,7 +64,7 @@ For input/output actions, the type could be:
 
 ## Exercises
 
-1) Give another possible calculation for the result of `double (double 2)`.
+Ex. 1) Give another possible calculation for the result of `double (double 2)`.
 
     double (double 2)
     double (2 + 2)
@@ -72,7 +72,7 @@ For input/output actions, the type could be:
     4 + 4
     8
 
-2) Show that `sum [x] = x` for any number `x`.
+Ex. 2) Show that `sum [x] = x` for any number `x`.
 
 - The sum of an empty list is 0.
 - The sum of a non-empty list is the sum of the first element with the sum of the remainder.
@@ -81,7 +81,7 @@ For input/output actions, the type could be:
 - The sum of the empty list is 0.
 - The sum of `x` and 0 is `x`.
 
-3) Define a function product that produces the product of a list of numbers,
+Ex. 3) Define a function product that produces the product of a list of numbers,
 and show using your definition that `product [2,3,4] = 24`.
 
     product :: Num a => [a] -> a
@@ -103,7 +103,7 @@ Calculation:
     24 * 1
     24
 
-4) How should the definition of the function `qsort` be modified so that it
+Ex. 4) How should the definition of the function `qsort` be modified so that it
 produces a _reverse_ sorted versoin of a list?
 
 The `bigger` elements are put to the left, the `smaller` elements to the right side of `[x]`:
@@ -115,7 +115,7 @@ The `bigger` elements are put to the left, the `smaller` elements to the right s
                         smaller = [a | a <- xs, a <= x]
                         bigger  = [b | b <- xs, b > x]
 
-5) What would be the effect of replacing <= by < in the original definition of
+Ex. 5) What would be the effect of replacing <= by < in the original definition of
 `qsort`? Hint: consider the example `qsort [2,2,3,1,1]`.
 
 Elements equal to the first element would be omitted. The result would be a

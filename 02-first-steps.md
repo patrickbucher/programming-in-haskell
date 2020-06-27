@@ -135,7 +135,7 @@ Haskell's syntax is very terse and differs from mathematical notations:
 | `f(x)`      | `f x`       | apply `f` to `x`                                                           |
 | `f(x,y)`    | `f x y`     | apply `f` to `x` and `y`                                                   |
 | `f(g(x))    | `f (g x)`   | apply `g` to `x`, and `f` to the result                                    |
-| `f(x,g(y))` | `f x (g y)  | apply `g` to `y`, and `f` to `x` and the result of `g`                     |
+| `f(x,g(y))` | `f x (g y)` | apply `g` to `y`, and `f` to `x` and the result of `g`                     |
 | `f(x) g(y)` | `f x * g y` | apply `f` to `x`, and `g` to `y`, the build the product of the two results |
 
 The application of a function binds strongest and does not need parentheses.
@@ -176,17 +176,17 @@ Haskell has single-line and multi-line comments:
 
 ## Exercises
 
-1) Work through the examples from this chapter using GHCi.
+Ex. 1) Work through the examples from this chapter using GHCi.
 
 ...
 
-2) Parenthesise the following nuemric expressions:
+Ex. 2) Parenthesise the following nuemric expressions:
 
     2^3*4    (2^3)*4
     2*3+4*5  (2*3)+(4*5)
     2+3*4^5  2+(3*(4^5)) 
 
-3) The script below contains three syntactic errors. Correct these errors and
+Ex. 3) The script below contains three syntactic errors. Correct these errors and
 then check that your script works properly using GHCi.
 
     N = a `div` length xs
@@ -199,7 +199,7 @@ then check that your script works properly using GHCi.
         a = 10
         xs = [1,2,3,4,5]
 
-4) The library function `last` selects the last element of a non-empty list;
+Ex. 4) The library function `last` selects the last element of a non-empty list;
 for example, `last [1,2,3,4,5] = 5`. Show how the function `last` could be
 defined in terms of the other library functions introduced in this chapter. Can
 you think of another possible definition?
@@ -208,7 +208,7 @@ you think of another possible definition?
 
     last [xs] = head (drop ((length xs) - 1) xs)
 
-5) The library function `init` removes the last element from a non-emtpy list;
+Ex. 5) The library function `init` removes the last element from a non-emtpy list;
 for example, `init [1,2,3,4,5] = [1,2,3,4]`. Show how `init` could similarly be
 defined in two different ways.
 
