@@ -170,3 +170,87 @@ Sections have the following applications:
 2. declaring types, such as `(+) :: Int -> Int -> Int`, because the operator
    itself is not a valid expression
 3. to use operators as arguments, such as `sum = foldl (+) 0`
+
+## Exercises
+
+Ex. 1) Using library functions, define a function `halve :: [a] -> ([a],[a])`
+that splits  an even-lengthed list into two halves. For example:
+
+    > halve [1,2,3,4,5,6]
+    ([1,2,3],[4,5,6])
+
+    -- note: only works for even-lengthed lists
+    halve :: [a] -> ([a],[a])
+    halve xs = (take n xs, drop n xs) where n = (length xs) `div` 2
+
+Ex. 2) Define a function `third :: [a] -> a` that returns the third element in
+a list that contains at least this many elements using:
+
+a. `head` an `tail`;
+b. list indexing `!!`;
+c. pattern matching.
+
+    -- a)
+    third_a :: [a] -> a
+    third_a xs = head (tail (tail xs))
+
+    -- b)
+    third_b :: [a] -> a
+    third_b xs = xs !! 2
+
+    -- c)
+    third_c :: [a] -> a
+    third_c (_:(_:(a:_))) = a
+
+Ex. 3) Consider a function `safetail :: [a] -> [a]` that behaves in the same
+way as `tail` except that it maps the empty list to itself rather than
+producing an error. Using `tail` and the function `null :: [a] -> Bool` that
+decides if a list is empty or not, define `safetail` using:
+
+a. a conditional expression;
+b. guarded equations;
+c. pattern matching.
+
+    null' :: [a] -> Bool
+    null' xs = if length xs == 0 then True else False
+
+    -- a
+    safetail_a :: [a] -> [a]
+    safetail_a xs = if null' xs then [] else tail xs
+
+    -- b
+    safetail_b :: [a] -> [a]
+    safetail_b xs | null' xs  = []
+                  | otherwise = tail xs
+
+    -- c
+    safetail_c :: [a] -> [a]
+    safetail_c [] = []
+    safetail_c xs = tail xs
+
+Ex. 4) In a similar way to `&&` in section 4.4, show how the disjunction
+operator `||` can be defined in four different ways using pattern matching.
+
+    (||) :: Bool -> Bool -> Bool
+
+    -- solution 1
+    True || True   = True
+    True || False  = True
+    False || True  = True
+    False || False = False
+
+    -- solution 2
+    True || _ = True
+    _ || True = True
+    _ || _    = False
+
+    -- solution 3
+    True || _  = True
+    False || a = a
+
+    -- solution 4
+    _ || True  = True
+    a || False = a
+    _ || _     = False
+
+TODO: Ex. 5 ff.
