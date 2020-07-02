@@ -74,3 +74,86 @@ Using lazy evaluations, prime numbers can be found using a list comprehension:
     primes n = [x | x <- [2..n], prime x]
     primes 20
     [2,3,5,7,11,13,17,19]
+
+`find`, when given a key to search for, returns a list of values belonging to
+that key:
+
+    find :: Eq a => a -> [(a,b)] -> [b]
+    find k t = [v | (k',v) <- t, k == k']
+
+    find 'a' [('a',1),('b',2),('c',3),('a',4)]
+    [1,4]
+
+## The `zip` Function
+
+`zip` creates a list by pairing successive elements from two existing lists:
+
+    zip [1,2,3] ['a','b','c']
+    [(1,'a'),(2,'b'),(3,'c')]
+
+`pairs` uses `zip` to create a list of adjacent elements:
+
+    pairs :: [a] -> [(a,a)]
+    pairs xs = zip xs (tail xs)
+
+    pairs [1,2,3,4]
+    [(1,2),(2,3),(3,4)]
+
+`sorted` uses `pairs` to determine if a list is sorted in ascending order:
+
+    sorted :: Ord a => [a] -> Bool
+    sorted xs = and [x <= y | (x,y) <- pairs xs]
+
+    sorted [1,2,3,4,5]
+    True
+    sorted [1,2,4,3,5]
+    False
+
+`positions` returns the indices of values found in a list:
+
+    positions :: Eq a => a -> [a] -> [Int]
+    positions x xs = [i | (x',i) <- zip xs [0..], x == x']
+
+    positions True [True,False,False,True,False,True]
+    [0.3,5]
+
+Thanks to lazy evaluation, the infinite list `[0..]` is only evaluated up to
+the point where all `xs` have been processed.
+
+## String Comprehensions
+
+Technically, a `String` is just a list of `Char` values, so list operations can
+also be applied to strings.
+
+    "foobar" !! 2
+    'o'
+
+    take 3 "foobar"
+    foo
+
+    length "foobar"
+    6
+
+    zip "abc" [1,2,3,4,5]
+    [('a',1),('b',2),('c',3)]
+
+Consequently, _string comprehensions_ are list comprehensions producing lists
+of `Char` values.
+
+`lowers` counts the number of lower-case letters in a string:
+
+    lowers :: String -> Int
+    lowers xs = length [x | x <- xs, x >= 'a' && x >= 'z']
+
+    lowers 'abc'
+    3
+    lowers 'Foobar'
+    6
+
+`count` counts the number of occurences of a given character in a string:
+
+    count :: Char -> String > Int
+    count x xs = length [x' | x' <- xs, x == x']
+
+    count 's' "Mississippi"
+    4
