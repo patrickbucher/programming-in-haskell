@@ -157,3 +157,96 @@ of `Char` values.
 
     count 's' "Mississippi"
     4
+
+## Exmample: Caesar Cipher
+
+The _Caesar Cipher_ is a simple (and insecure) method to encrypt textual
+information. Every letter of the alphabet is shifted by an offset, which again
+can be used to decrypt the message.
+
+`let2int` converts a character (letter) to an integer:
+
+    let2int :: Char -> Int
+    let2int c = ord c - or 'a'
+
+`int2let` performs the opposite operation:
+
+    int2let :: Int -> Char
+    int2let n = chr (ord 'a' + n)
+
+`ord` and `chr` are library functions, which convert from characters to integers
+(unicode code point) and vice-versa, and need to be imported from `Data.Char`:
+
+    import Data.Char
+
+`shift` moves a letter by n positions, and makes sure the alphabet is wrapped at
+the end:
+
+    shift :: Int -> Char -> Char
+    shift n c | isLower c = int2let ((let2int c + n) `mod` 26
+              | otherwise = c
+
+Only lower-case characters are shifted, other characters are left as they are.
+`isLower` is a predicate (`Char -> Bool`) that checks if a character is a
+lower-case letter.
+
+The `shift` function can deal with both negative and positive offsets:
+
+    shift 3 'a'
+    'd'
+
+    shift (-3) 'd'
+    'a'
+
+`encode` applies the `shift` function to an entire string using a list
+comprehension:
+
+    encode :: Int -> String -> String
+    encode n xs = [shift n x | x <- xs]
+
+    encode 13 "Hello, World!"
+    "Hryyb, Wbeyq!"
+
+    encode (-13) "Hryyb, Wbeyq!"
+    "Hello, World!"
+
+    encode (-13) (encode 13 "Hello, World!")
+    "Hello, World!"
+
+The Caesar cipher can be cracked (i.e. the shift factor can be found) using
+_frequency tables_, since letters have different frequencies in natural
+languages.
+
+`percent` calculates a percentage using the `fromIntegral` library function,
+which converts an integer to a float value:
+
+    percent :: Int -> Int -> Float
+    percent n m = (fromIntegral n / fromIntegral m)
+
+    percent 2 8
+    0.25
+
+Using `lowers` and `count` from the previous section, `percent` can be used to
+calculate the frequencies in a string:
+
+    freqs :: String -> [Float]
+    freqs xs = [percent (count x xs) n | x <- ['a'..'z']] where n = lowers xs
+
+    freqs "abbcccdddd"
+    [0.1,0.2,0.3,0.4,...] -- omitted
+
+The _chi-square statistic_ compares a list of observed frequencies (`os`) with
+expected frequencies (`es`); the smaller the value, the better the match:
+
+    chisqr :: [Float] -> [Float] -> Float
+    chisqr os es = sum [((o-e)^2)/e | (o,e) <- zip os es]
+
+`rotate` rotates a list by `n` items:
+
+    rotate :: Int -> [a] -> [a]
+    rotate n xs = drop n xs ++ take n xs
+
+    rotate 3 [1,2,3,4,5]
+    [4,5,1,2,3]
+
+TODO
