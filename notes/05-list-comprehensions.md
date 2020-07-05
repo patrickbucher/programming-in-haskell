@@ -288,3 +288,34 @@ defined:
 
     crack "p sprl wyvnyhttpun pu ohzrlss"
     "i like programming in haskell"
+
+## Exercises
+
+Ex. 1) Using a list comprehension, give an expression that calculates the sum
+1^2 + 2^2 + … + 100^2 of the first one hundred integer squares.
+
+    sum [n * n | n <- [1..1000]]
+
+Ex. 2) Suppose that a _coordinate grid_ of size m * n is given by the list of
+all pairs `(x,y)` of integers such that `0 <= x <= m` and `0 <= y <= n`. Using
+a list comprehension, define a function `grid :: Int -> Int -> [(Int,Int)]`
+that returns a coordinate grid of a given size. For example:
+
+    > grid 1 2
+    [(0,0),(0,1),(0,2),(1,0),(1,1),(1,2)]
+
+    grid :: Int -> Int -> [(Int,Int)]
+    grid m n = [(x,y) | x <- [0..m], y <- [0..n]]
+
+Ex. 3) Using a list comprehension and the function `grid` above, define a
+function `square :: Int -> [(Int,Int)]` that returns a coordinate square of
+size n, excluding the diagonal from `(0.0)` to `(n,n)`. For example:
+
+    > square 2
+    [(0,1),(0,2),(1,0),(1,2),(2.0),(2,1)]
+
+    first (a,_) = a
+    second (_,a) = a
+
+    square :: Int -> [(Int,Int)]
+    square n = [p | p <- grid n n, first p /= second p]
