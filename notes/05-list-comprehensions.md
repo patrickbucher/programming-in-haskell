@@ -221,7 +221,7 @@ languages.
 which converts an integer to a float value:
 
     percent :: Int -> Int -> Float
-    percent n m = (fromIntegral n / fromIntegral m)
+    percent n m = (fromIntegral n / fromIntegral m) * 100
 
     percent 2 8
     0.25
@@ -249,4 +249,42 @@ expected frequencies (`es`); the smaller the value, the better the match:
     rotate 3 [1,2,3,4,5]
     [4,5,1,2,3]
 
-TODO
+A pre-calculated frequency table for English is defined as follows:
+
+    table :: [Float]
+    table = [8.1, 1.5, 2.8, 4.2, 12.7, 2.2, 2.0, 6.1, 7.0, 0.2, 0.8, 4.0, 2.4,
+             6.7, 7.5, 1.9, 0.1, 6.0, 6.3, 9.0, 2.8, 1.0, 2.4, 0.2, 2.0, 0.1]
+
+The frequency of an encoded string is calculated:
+
+    table' :: [Float]
+    table' = freqs (encode 8 "there are a lot of programming languages out there")
+
+`chisqr` and `rotate` can be combined to calculate the chi-square statistics of
+the frequency of an encoded string (`table'`) and a pre-calculated frequency 
+table (`table`):
+
+    [chisqr (rotate n table') table | n <- [0..25]]
+    [1672.7759,257.30905,1938.5552,1630.6279,956.50464,916.4745,1231.2474,
+    335.0136,62.297523,2912.6172,401.4097,1875.3435,557.8009,2715.9778,
+    258.70398,2111.4563,1120.2826,878.5908,2094.0308,373.97214,373.1325,
+    346.10455,2472.9614,1230.1863,1386.4891,1470.9138]
+
+The value with the index 8 (62.297523) is the lowest in the list, so likely
+eight was used to encode the string.
+
+Combined with the `positions` and `minimum` function, a `crack` function can be
+defined:
+
+    crack :: String -> String
+    crack xs = encode (-factor) xs
+               where
+                   factor = head (positions (minimum chitab) chitab)
+                   chitab = [chisqr (rotate n table') table | n <- [0..25]]
+                   table' = freqs xs
+
+    encode 7 "i like programming in haskell"
+    "p sprl wyvnyhttpun pu ohzrlss"
+
+    crack "p sprl wyvnyhttpun pu ohzrlss"
+    "i like programming in haskell"
