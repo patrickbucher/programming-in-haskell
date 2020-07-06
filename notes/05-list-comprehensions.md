@@ -319,3 +319,63 @@ size n, excluding the diagonal from `(0.0)` to `(n,n)`. For example:
 
     square :: Int -> [(Int,Int)]
     square n = [p | p <- grid n n, first p /= second p]
+
+Ex. 4) In a similar way to the function `length`, show how the library function
+`replicate :: Int -> a -> [a]` that produces a list of identical elements can
+be defined using a list comprehension. For example:
+
+    > replicate 3 True
+    [True,True,True]
+
+    replicate n x = [x | x <- [1..n]]
+
+Ex. 5) A triple (x, y, z) of positive integers is _Pythagorean_ if it satisfies
+the equation `x^2 + y^2 = z^2`. Using a list comprehension with three
+generators, define a function `pyths :: Int -> [(Int,Int,Int)]` that returns
+the list of all such triples whose components are at most a given limit. For
+example:
+
+    > pyths 10
+    [(3,4,5),(4,3,5),(6,8,10),(8,6,10)]
+
+    pyths n = [(x,y,z) | x <- [1..n], y <- [1..n], z <- [1..n], x*x + y*y == z*z]
+
+Ex. 6) A positive integer is _perfect_ if it equals the sum of all of its
+factors, excluding the number itself. Using a list comprehension and the
+function `factors`, define a functon `perfects :: Int -> [Int]` that returns
+the list of all perfect numbers up to a given limit. For example:
+
+    > perfects 500
+    [6,28,496]
+
+    head xs = take (length xs - 1) xs
+    perfects n = [x | x <- [1..n], sum (head (factors x)) == x]
+
+Ex. 7) Show how the list comprehension `[(x,y) | x <- [1,2], y <- [3,4]]` with
+two generators can be re-expressed using two comprehensions with single
+generators. Hint: nest one comprehension within the other and make use of the
+library function `concat :: [[a]] -> [a]`.
+
+    concat [[(1,a) | a <- [3,4]],[(2,b) | b <- [3,4]]]
+
+Ex. 8) Redefine the function `positions` using the function `find`.
+
+    positions x xs = find x (zip xs [0..])
+
+Ex. 9) The _scalar product_ of two lists of integers `xs` and `ys` of length
+`n` is given by the sum of the product of corresponding integers:
+
+    sum from i=0 to n-1 of (xs_i * ys_i)
+
+In a similar to `chisqr`, show how a list comprehension can be used to define a
+function `scalarproduct :: [Int] -> [Int] -> Int` that returns the scalar
+product of two lists. For example:
+
+    > scalarproduct [1,2,3] [4,5,6]
+    32  
+
+    scalarproduct xs ys = sum [x * y | (x,y) <- zip xs ys]
+
+Ex. 9) Modify the Caesar cipher program to also handle upper-case letters.
+
+TODO
