@@ -2,13 +2,16 @@ import Data.Char
 
 let2int :: Char -> Int
 let2int c = ord c - ord 'a'
+-- TODO: isLower: 'a', isUpper: 'A'
 
 int2let :: Int -> Char
 int2let n = chr (ord 'a' + n)
+-- TODO: check if chr n in 'a'..'z' or 'A'..'Z'
 
 shift :: Int -> Char -> Char
 shift n c | isLower c = int2let ((let2int c + n) `mod` 26)
           | otherwise = c
+-- TODO: isLower c or isUpper c
 
 encode :: Int -> String -> String
 encode n xs = [shift n x | x <- xs]
@@ -18,6 +21,7 @@ percent n m = (fromIntegral n / fromIntegral m) * 100
 
 freqs :: String -> [Float]
 freqs xs = [percent (count x xs) n | x <- ['a'..'z']] where n = lowers xs
+-- TODO: convert xs to lower before counting
 
 count :: Char -> String -> Int
 count x xs = sum [1 | x' <- xs, x' == x]
@@ -47,3 +51,4 @@ crack xs = encode (-factor) xs
                factor = head (positions (minimum chitab) chitab)
                chitab = [chisqr (rotate n table') table | n <- [0..25]]
                table' = freqs xs
+-- TODO: convert table' to lower first
