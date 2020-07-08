@@ -378,4 +378,36 @@ product of two lists. For example:
 
 Ex. 9) Modify the Caesar cipher program to also handle upper-case letters.
 
-TODO
+    -- first change: lower and upper case
+    let2int :: Char -> Int
+    let2int c | isLower c = ord c - ord 'a' + 26
+              | isUpper c = ord c - ord 'A'
+              | otherwise = ord c
+
+    -- second change: lower and upper case
+    int2let :: Int -> Char
+    int2let n | n >= 0 && n < 26 = chr (ord 'A' + n)
+              | n >= 26 && n < 52 = chr (ord 'a' + n - 26)
+              | otherwise = chr n
+
+    -- third change: lower and upper case
+    shift :: Int -> Char -> Char
+    shift n c | isLower c = int2let ((let2int c + n - 26) `mod` 26 + 26)
+              | isUpper c = int2let ((let2int c + n) `mod` 26)
+              | otherwise = c
+
+    -- fourth change: toLowerString function
+    toLowerString :: [Char] -> [Char]
+    toLowerString xs = [toLower x | x <- xs]
+
+    -- fifth change: convert to lower case for counting
+    freqs :: String -> [Float]
+    freqs xs = [percent (count x (toLowerString xs)) n | x <- ['a'..'z']] where n = alphas xs
+
+    -- sixth change: convert xs to lower case for frequency calculation
+    crack :: String -> String
+    crack xs = encode (-factor) xs
+               where
+                   factor = head (positions (minimum chitab) chitab)
+                   chitab = [chisqr (rotate n table') table | n <- [0..25]]
+                   table' = freqs (toLowerString xs)
