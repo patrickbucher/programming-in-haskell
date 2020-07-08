@@ -376,7 +376,7 @@ product of two lists. For example:
 
     scalarproduct xs ys = sum [x * y | (x,y) <- zip xs ys]
 
-Ex. 9) Modify the Caesar cipher program to also handle upper-case letters.
+Ex. 10) Modify the Caesar cipher program to also handle upper-case letters.
 
     -- first change: lower and upper case
     let2int :: Char -> Int
