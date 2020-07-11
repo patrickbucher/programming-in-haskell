@@ -161,3 +161,168 @@ Example:
     insert 4 (insert 2 [1,5])
     insert 4 [1,2,5]
     [1,2,4,5]
+
+## Multiple Arguments
+
+The `zip` function merges two lists to one, by pairing up the leftmost elements
+of both lists to a tuple. The process ends, as soon as one of the two lists is
+exhausted:
+
+    zip :: [a] -> [b] -> [(a,b)]
+    zip [] _          = []
+    zip _ []          = []
+    zip (x:xs) (y:ys) = (x,y) : zip xs ys
+
+Two base cases are required, because either the left or right list might be
+exhausted first. The remainder is discarded. Example:
+
+    zip [1,2,3] ['a','b','c','d']
+    zip (1:[2,3]) ('a':['b','c','d'])
+    (1,'a') : zip [2,3] ['b','c','d']
+    (1,'a') : (zip (2:[3]) ('b':['c','d']))
+    (1,'a') : ((2,'b') : (zip [3] ['c','d']))
+    (1,'a') : ((2,'b') : (zip (3:[]) ('c':['d'])))
+    (1,'a') : ((2,'b') : ((3,'c') : (zip [] ['d'])))
+    (1,'a') : ((2,'b') : ((3,'c') : [])) -- first base case
+    (1,'a') : ((2,'b') : [(3,'c')])
+    (1,'a') : [(2,'b'),(3,'c')]
+    [(1,'a'),(2,'b'),(3,'c')]
+
+The library function `drop` requires two base cases, too:
+
+    drop :: Int -> [a] -> [a]
+    drop 0 xs = xs
+    drop _ [] = []
+    drop n (_:xs) = drop (n-1) xs
+
+Example:
+
+    drop 3 [1,2,3,4,5,6]
+    drop 3 (_:[2,3,4,5,6])
+    drop 2 [2,3,4,5,6]
+    drop 2 (_:[3,4,5,6])
+    drop 1 [3,4,5,6]
+    drop 1 (_:[4,5,6])
+    drop 0 [4,5,6]
+    [4,5,6]
+
+## Multiple Recursion
+
+A function that applies itself more than once in its own definition is said to
+use _multiple recursion_.  The fibonaccy sequence can be defined recursively
+using that technique:
+
+    fib :: Int -> Int
+    fib 0 = 0
+    fib 1 = 1
+    fib n = fib (n-2) + fib (n-1)
+
+Example:
+
+    fib 5
+    fib 3 + fib 4
+    (fib 1 + fib 2) + (fib 2 + fib 3)
+    (1 + (fib 0 + fib 1)) + ((fib 0 + fib 1) + (fib 1 + fib 2))
+    (1 + (0 + 1)) + ((0 + 1) + (1 + (fib 0 + fib 1)))
+    (1 + 1) + (1 + (1 + (0 + 1)))
+    2 + (1 + (1 + 1))
+    2 + (1 + 2)
+    2 + 3
+    5
+
+The function `qsort` uses multiple recursion for sorting the left and right
+hand side of the pivot element.
+
+Multiple recursion makes the call stack grow very fast.
+
+## Mutual Recursion
+
+Functions that are defined recursively in terms of each other are said to apply
+_mutual recursion_.
+
+The functions `even` and `odd` can be defined (inefficiently) using mutual
+recursion:
+
+    even :: Int -> Bool
+    even 0 = True
+    even n = odd (n-1)
+
+    odd :: Int -> Bool
+    odd 0 = False
+    odd n = even (n-1)
+
+A number is even, if a number smaller by one is odd, and vice versa.
+
+Example:
+
+    even 7
+    odd 6
+    even 5
+    odd 4
+    even 3
+    odd 2
+    even 1
+    odd 0
+    False
+
+The even and odd elements of a list in terms of their index can be found in a
+similar fashion:
+
+    evens :: [a] -> [a]
+    evens []     = []
+    evens (x:xs) = x : odds xs
+
+    odds :: [a] -> [a]
+    odds []     = []
+    odds (_:xs) = evens xs
+
+Example:
+
+    evens "abc"
+    evens ('a':['b','c'])
+    'a' : odds ['b','c']
+    'a' : (odds (_:['c'])
+    'a' : (evens ['c'])
+    'a' : (evens ('c':[]))
+    'a' : ('c' : odds [])
+    'a' : ('c' : [])
+    'a' : ['c']
+    ['a','c']
+
+## Advice on Recursion
+
+Recursive functions can be defined by following this recipe:
+
+1. define the type
+2. enumerate the cases
+3. define the simple cases
+4. define the other cases
+5. generalise and simplify
+
+For example, `product` can be defined as follows:
+
+Step 1, define the type:
+
+    product :: [Int] -> Int
+
+Step 2, enumerate the cases:
+
+    product []     =
+    product (n:ns) =
+
+Step 3, define the simple cases:
+
+    product [] = 1
+
+Step 4, define the other cases:
+
+    product (n:ns) = n * product ns
+
+Step 5, generalise and simplify:
+
+    product :: Num a => [a] -> a
+    product = foldr (*) 1
+
+## Exercises
+
+TODO: p. 71
