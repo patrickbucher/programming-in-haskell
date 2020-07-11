@@ -99,4 +99,65 @@ non-empty list is its head attached to its reversed tail. Example:
     [4,3,2] ++ [1]
     [4,3,2,1]
 
-TODO: append operator, p. 62
+The append operation can be defined recursively:
+
+    (++) :: [a] -> [a] -> [a]
+    []     ++ ys = ys
+    (x:xs) ++ ys = x : (xs ++ ys)
+
+Attaching an empty list in front of second list is the same as the second list
+(base case). A non-empty list can be attached to the front of a second list by
+copying elements of the first list from the left (recursive case). Example:
+
+    [1,2,3] ++ [4,5,6]
+    1 : ([2,3] ++ [4,5,6])
+    1 : (2 : ([3] ++ [4,5,6]))
+    1 : (2 : (3 : ([] ++ [4,5,6])))
+    1 : (2 : (3 : ([4,5,6])))
+    1 : (2 : ([3,4,5,6]))
+    1 : ([2,3,4,5,6])
+    [1,2,3,4,5,6]
+
+An element can be inserted at the right spot into an ordered list recursively:
+
+    insert :: Ord a => a -> [a] -> [a]
+    insert x []                 = [x]
+    insert x (y:ys) | x <= y    = x : y : ys
+                    | otherwise = y : insert x ys
+
+Inserting an element into an empty list is a list consisting just of that
+element (base case). For the recursive case, two cases must be distinguished.
+If the element to be inserted is smaller or equal compared to the list's
+leftmost element, the right spot is found. Otherwise, the element must be
+inserted in the list's remainder. Example:
+
+    insert 13 [10,20,30]
+    insert 13 (10 : [20,30])
+    10 : (insert 13 [20,30])
+    10 : (insert 13 (20:[30]))
+    10 : (13 : 20 : [30])
+    10 : (13 : [20,30])
+    10 : [13,20,30]
+    [10,13,20,30]
+
+The `insert` function can be used to implement _insertion sort_:
+
+    isort :: Ord a => [a] -> [a]
+    isort []     = []
+    isort (x:xs) = insert x (isort xs)
+
+The leftmost element is to be inserted in the tail of the list, which shrinks
+with every step.
+
+Example:
+
+    isort [4,2,1,5]
+    insert 4 (isort [2,1,5])
+    insert 4 (insert 2 (isort [1,5]))
+    insert 4 (insert 2 (insert 1 (isort [5])))
+    insert 4 (insert 2 (insert 1 (insert 5 (isort []))))
+    insert 4 (insert 2 (insert 1 (insert 5 [])))
+    insert 4 (insert 2 (insert 1 [5]))
+    insert 4 (insert 2 [1,5])
+    insert 4 [1,2,5]
+    [1,2,4,5]
