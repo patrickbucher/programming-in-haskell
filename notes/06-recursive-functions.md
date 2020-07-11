@@ -325,4 +325,123 @@ Step 5, generalise and simplify:
 
 ## Exercises
 
-TODO: p. 71
+Ex. 1) How does the recursive version of the factorial function behave if
+applied to a negative argument, such as `(-1)`? Modify the definition to
+prohibit negative arguments by adding a guard to the recursive case:
+
+Original definition:
+
+    fac :: Int -> Int
+    fac 0 = 1
+    fac n = n * fac (n-1)
+
+    fac (-1)
+    (-1) * (fac (-2))
+    (-1) * ((-2) * (fac (-3)))
+    ...
+    Exception: stack overflow
+
+Improved definition:
+
+    fac :: Int -> Int
+    fac 0 = 1
+    fac n | n < 0     = 0
+          | otherwise = n * fac (n-1)
+
+Ex. 2) Define a recursive function `sumdown :: Int -> Int` that returns the sum
+of the non-negative integers from a given value down to zero. For example,
+`sumdown 3` should return the result `3+2+1+0 = 6`.
+
+    sumdown :: Int -> Int
+    sumdown 0             = 0
+    sumdown n | n < 0     = 0
+              | otherwise = n + sumdown (n - 1)
+
+Ex. 3) Define the exponentiation operator `^` for non-negative integers using
+the same pattern of recursion as the multiplication operator `*`, and show how
+the expression `2 ^ 3` is evaluated using your definition.
+
+    (^) :: Int -> Int -> Int
+    0 ^ _ = 0
+    m ^ 0 = 1
+    m ^ n = m * (m ^ (n - 1))
+
+    2 ^ 3
+    2 * (2 ^ (3 - 1))
+    2 * (2 ^ 2)
+    2 * (2 * (2 ^ (2 - 1)))
+    2 * (2 * (2 ^ 1))
+    2 * (2 * (2 * (2 ^ (1 - 1))))
+    2 * (2 * (2 * (2 ^ 0)))
+    2 * (2 * (2 * 1))
+    2 * (2 * 2)
+    2 * 4
+    8
+
+Ex. 4) Define a recursive function `euclid :: Int -> Int -> Int` that
+implements _Euclid's algorithm_ for calculating the greatest common divisor of
+two non-negative integers: if the two numbers are equal, this number is the
+result; otherwise, the smaller number is subtracted from the larger, and the
+same process is then repeated. For example:
+
+    > euclid 6 27
+    3
+
+    euclid :: Int -> Int -> Int
+    euclid 0 _ = 0
+    euclid _ 0 = 0
+    euclid 1 _ = 1
+    euclid _ 1 = 1
+    euclid x y | x == y = x
+               | x > y  = euclid (x - y) y
+               | x < y  = euclid (y - x) x
+
+Ex. 5) Using the recursive definitions given in this chapter, show how `length
+[1,2,3]`, `drop 3 [1,2,3,4,5]`, and `init [1,2,3]` are evaluated.
+
+    length :: [a] -> Int
+    length []     = 0
+    length (_:xs) = 1 + length xs
+
+    length [1,2,3]
+    length (_:[2,3])
+    1 + length [2,3]
+    1 + length (_:[3])
+    1 + (1 + length [3])
+    1 + (1 + length (_:[]))
+    1 + (1 + (1 + length []))
+    1 + (1 + (1 + 0))
+    1 + (1 + 1)
+    1 + 2
+    3
+
+
+    drop :: Int -> [a] -> [a]
+    drop 0 xs = xs
+    drop _ [] = []
+    drop n (_:xs) = drop (n-1) xs
+
+    drop 3 [1,2,3,4,5]
+    drop 3 (_:[2,3,4,5])
+    drop (3 - 1) [2,3,4,5]
+    drop 2 [2,3,4,5]
+    drop 2 (_:[3,4,5])
+    drop (2 - 1) [3,4,5]
+    drop 1 [3,4,5]
+    drop 1 (_:[4,5])
+    drop (1 - 1) [4,5]
+    drop 0 [4,5]
+    [4,5]
+
+    init :: [a] -> [a]
+    init [_]    = []
+    init (x:xs) = x : init xs
+
+    init [1,2,3]
+    init (1:[2,3])
+    1 : init [2,3]
+    1 : init (2:[3])
+    1 : (2 : init [3])
+    1 : (2 : [])
+    1 : [2]
+    [1,2]
