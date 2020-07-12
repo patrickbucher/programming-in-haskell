@@ -445,3 +445,158 @@ Ex. 5) Using the recursive definitions given in this chapter, show how `length
     1 : (2 : [])
     1 : [2]
     [1,2]
+
+Ex. 6) Without looking at the definitions from the standard prelude, define the
+following library functions on lists using recursion.
+
+a.) Decide if all logical values in a list are `True`:
+
+    and :: [Bool] -> Bool
+    and []        = True
+    and (False:_) = False
+    and (True:xs) = and xs
+
+b.) Concatenate a list of lists:
+
+    concat :: [[a]] -> [a]
+    concat [[]]     = []
+    concat [[xs]]   = [xs]
+    concat (xs:[])  = [x | x <- xs]
+    concat (xs:xss) = [x | x <- xs] ++ concat xss
+
+c.) Produce a list with `n` identical elements: 
+
+    replicate :: Int -> a -> [a]
+    replicate 0 x = []
+    replicate n x = [x] ++ replicate (n - 1) x
+
+d.) Select the nth element of a list:
+
+    (!!) :: [a] -> Int -> a
+    (!!) (x:_) 0  = x
+    (!!) (_:xs) n = xs !! (n - 1)
+
+e.) Decide if a value is an element of a list:
+
+    elem :: Eq a => a -> [a] -> Bool
+    elem x []     = False
+    elem x (y:ys) | x == y = True
+                  | x /= y = elem x ys
+
+Ex. 7) Define a recursive function `merge :: Ord a => [a] -> [a] -> [a]` that
+merges two sorted lists to give a single sorted list. For example:
+
+    > merge [2,5,6] [1,3,4]
+    [1,2,3,4,5,6]
+
+    merge :: Ord a => [a] -> [a] -> [a]
+    merge [] ys     = ys
+    merge xs []     = xs
+    merge xs (y:ys) = merge ([x | x <- xs, x <= y] ++ [y] ++ [x | x <- xs, x > y]) ys
+
+Ex. 8) Using `merge`, define a function `msort :: Ord a => [a] -> [a]` that
+implements _merge sort_, in which the empty list and singleton lists are
+already sorted, and any other list is sorted by merging together the two lists
+that result from sorting the two halves of the list separately.
+
+Hint: first define a function `halve :: [a] -> ([a],[a])` that splits a list
+into two halves whose lengths differ by at most one.
+
+    merge :: Ord a => [a] -> [a] -> [a]
+    merge [] ys     = ys
+    merge xs []     = xs
+    merge xs (y:ys) = merge ([x | x <- xs, x <= y] ++ [y] ++ [x | x <- xs, x > y]) ys
+
+    halve :: [a] -> ([a],[a])
+    halve []  = ([],[])
+    halve [x] = ([x],[])
+    halve xs  = (take ((length xs) `div` 2) xs, drop ((length xs) `div` 2) xs)
+
+    first :: (a,a) -> a
+    first (a,_) = a
+
+    second :: (a,a) -> a
+    second (_,a) = a
+
+    msort :: Ord a => [a] -> [a]
+    msort []  = []
+    msort [x] = [x]
+    msort xs  = merge (msort (first (halve xs))) (msort (second (halve xs)))
+
+Ex. 9) Using the five step process, construct the library functions that:
+
+a.) calculate the `sum` of a list of numbers;
+
+Step 1: define the type:
+
+    sum :: Num a => [a] -> a
+
+Step 2: enumerate the cases:
+
+    sum []     =
+    sum (x:xs) =
+
+Step 3: define the simple cases:
+
+    sum []     = 0
+
+Step 4: define the other cases:
+
+    sum (x:xs) = x + sum xs
+
+Step 5: generalise and simplify:
+
+    [nothing to do]
+
+b.) `take` a given number of elements from the start of a list;
+
+Step 1: define the type:
+
+    take :: Int -> [a] -> [a]
+
+Step 2: enumerate the cases:
+
+    take 0 []     =
+    take n []     =
+    take 1 (x:_)  =
+    take n (x:xs) =
+
+Step 3: define the simple cases:
+
+    take 0 []     = []
+    take n []     = []
+
+Step 4: define the other cases:
+
+    take 1 (x:_)  = [x]
+    take n (x:xs) = [x] ++ take (n - 1) xs
+
+Step 5: generalise and simplify:
+
+    take :: Int -> [a] -> [a]
+    take 1 (x:_)  = [x]
+    take n (x:xs) | n <= (length xs) + 1 = [x] ++ take (n - 1) xs
+                  | otherwise            = []
+
+c.) select the `last` element of a non-empty list.
+
+Step 1: define the type:
+
+    last :: [a] -> a
+
+Step 2: enumerate the cases:
+
+    last [x]    =
+    last (x:xs) =
+
+Step 3: define the simple cases:
+
+    last [x]    = x
+
+Step 4: define the other cases:
+
+    last (x:xs) = last xs
+
+Step 5: generalise and simplify:
+
+    [nothing to do]
