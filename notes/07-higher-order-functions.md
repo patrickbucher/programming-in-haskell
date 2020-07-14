@@ -170,4 +170,167 @@ as the list is exhausted:
     foldr (+) 0 [1,2,3]
     1+(2+(3+0))
 
+As a general pattern, `foldr` is evaluated as follows:
+
     foldr (#) v [x0,x1,...,xn] = x0 # (x1 # (... (xn # v) ...))
+
+## The `foldl` Function
+
+`sum` can be redifened using an operator that associates to the left, and an
+additional function called `sum'`:
+
+    sum :: Num a => [a] -> a
+    sum = sum' 0
+          where
+             sum' v []     = v
+             sum' v (x:xs) = sum' (v+x) xs
+
+Example:
+
+    sum [2,4,6]
+    sum' 0 [2,4,6]
+    sum' (0+2) [4,6]
+    sum' ((0+2)+4) [6]
+    sum' (((0+2)+4)+6) []
+    (((0+2)+4)+6)
+    ((2+4)+6)
+    (6+6)
+    12
+
+As a pattern, left-associative functions can be generalised as follows:
+
+    f v []     = v
+    f v (x:xs) = f (v # x) xs
+
+An empty list is mapped to a _accumulator_ value `v`. For every step, the
+accumulator is re-calculated using the old accumulator value, the operator `#`,
+and the list's head.
+
+The `foldl` function implements this pattern, and can be used to simplify the
+definition of `sum` from above:
+
+    sum :: Num a => [a] -> a
+    sum = foldl (*) 1
+
+Other functions, defined using `foldr` before, can be defined using `foldl` as
+follows:
+
+    product :: Num a => [a] -> a
+    product = foldl (*) 1
+
+    or :: [Bool] -> Bool
+    or = foldl (||) False
+
+    and :: [Bool] -> Bool
+    and = foldl (&&) True
+
+`foldl` itself can be defined recursively:
+
+    foldl :: (a -> b -> a) -> a -> [b] -> a
+    foldl f v [] = v
+    foldl f v (x:xs) = foldl f (f v x) xs
+
+As a general pattern, `foldl` is evaluated as follows:
+
+    foldl (#) v [x0,x1,...,xn] = (... ((v # x0) # x1) ...) # xn
+
+## The Composition Operator
+
+The operator `.` combines two given functions to a single function and returns
+this _composition_ as a new function:
+
+    (.) :: (b -> c) -> (a -> b) -> (a -> c)
+    f . g = \x -> f (g x)
+
+The composition of `f` and `g` of `x` is defined as `(f . g) x = f (g x)`. The
+result of the above definition is a lambda expression that accepts `x` as a
+parameter. Example:
+
+    f = (*2)
+    g = (+1)
+    h = f . g
+    h 5
+    12
+
+The inner function `g` adds one to the parameter, the outer function `f`
+doubles the parameter:
+
+    h 5 = f (g 5)
+    h 5 = f 6
+    h 5 = 12
+
+The following definitions:
+
+    odd n = not (even n)
+
+    twice f x = f (f x)
+
+    sumsquareseven ns = sum (map (^2) (filter even ns))
+
+Can be simplified using the compose operator:
+
+    odd = not . even
+
+    twice f = f . f
+
+    sumsquareseven = sum . map (^2) . filter even
+
+Note that composition is associative:
+
+    f . (g . h) = (f . g) . h
+
+## Binary String Transmitter
+
+A binary number can be converted to a decimal number by considering every digit
+separately with a weight doubling to the left `(w * b)`:
+
+    1101 = (8 * 1) + (4 * 1) + (2 * 0) + (1 * 1)
+
+The weights can be noted in an increasing manner when reversing the binary
+number:
+
+    1011 = (1 * 1) + (2 * 1) + (4 * 0) + (8 * 1)
+
+A list of binary digits can be converted to decimal as follows:
+
+    type Bit = Int
+
+    bin2int :: [Bit] -> Int
+    bin2int bits = sum [w*b | (w,b) <- zip weights bits']
+                   where weights = iterate (*2) 1
+                         bits' = reverse bits
+
+`Bit` is introduced as an additional type. The function `iterate` produces an
+infinite sequence of numbers starting by 1, and increasing by the factor of 2
+with every iteration. Example:
+
+    bin2int [1,0,1,1] = sum [w*b | (w,b) <- zip [1,2,4,8] [1,1,0,1]]
+                        sum [w*b | (w,b) <- [1,1,2,1,4,0,8,1]]
+                        sum [1*1,2*1,4*0,8*1]
+                        sum [1,2,0,8]
+                        11
+
+Generally, a reversed four-digit binary number `[a,b,c,d]` can be converted to
+binary as follows:
+
+    (1 * a) + (2 * b) + (4 * c) + (8 * d)
+
+This expression can be restructured:
+
+
+    a + (2 * b) + (4 * c) + (8 * d) | factoring out 2
+    a + 2 * (b + (2 * c) + (4 * d)) | factoring out 2
+    a + 2 * (b + 2 * (c + (2 * d))) | factoring out 2
+    a + 2 * (b + 2 * (c + 2 * (d))) | complicating d with (+ 2 * 0)
+    a + 2 * (b + 2 * (c + 2 * (d + 2 * 0)))
+
+The last expression has the same structure as a nested cons operation, where
+the first argument is added twice to the second argument. The empty list is
+replaced with 0.
+
+The function can thus be simplified using foldr:
+
+    bit2int bits = bit2int' (reverse bits)
+    bit2int' = foldr (\x y -> x + 2*y) 0
+
+TODO: p. 84
