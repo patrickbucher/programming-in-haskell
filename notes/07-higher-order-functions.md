@@ -333,4 +333,73 @@ The function can thus be simplified using foldr:
     bit2int bits = bit2int' (reverse bits)
     bit2int' = foldr (\x y -> x + 2*y) 0
 
-TODO: p. 84
+A decimal number can be converted into a binary number by repeatedly dividing
+the decimal number by two until 0 is reached. Reading the remainders backwards
+gives the sequence of binary digits:
+
+    13 / 2 = 6 R 1
+     6 / 2 = 3 R 0
+     3 / 2 = 1 R 1
+     1 / 2 = 0 R 1
+
+    1101
+
+`int2bin` implements this algorithm:
+
+    int2bin :: Int -> [Bit]
+    int2bin n = reverse (int2bin' n)
+    int2bin' 0 = []
+    int2bin' n = n `mod` 2 : int2bin' (n `div` 2)
+
+    int2bin 13
+    [1,1,0,1]
+
+`make8` ensures that the sequence is always 8 bit (i.e. one byte) long:
+
+    make8 :: [Bit] -> [Bit]
+    make8 bits = reverse (take 8 ((reverse bits) ++ repeat 0))
+
+    make8 (int2bin 25)
+    [0,0,0,1,1,0,0,1]
+
+These functions allow to encode strings as binary sequences:
+
+    import Data.Char
+
+    encode :: String -> [Bit]
+    encode = concat . map (make8 . int2bin . ord)
+
+The code point of every character is found using `ord`. The code point is then
+converted to binary (`int2bin`) and aligned into a byte (`make8`). This is done
+for every individual character (`map`). The results are then concatenated.
+
+The reverse process starts by chopping up the entire sequence into blocks of
+eight bits:
+
+    chop8 :: [Bit] -> [[Bit]]
+    chop8 []   = []
+    chop8 bits = take 8 bits : chop8 (drop 8 bits)
+
+Decoding is almost the same as encoding, albeit in reverse order:
+
+    decode :: [Bit] -> String
+    decode = map (chr . bin2int) . chop8
+
+The bitstream is first chopped up into bytes. The individual bytes are then
+converted to decimals, and the resulting code points are converted to
+characters.
+
+    decode (encode "abc")
+    "abc"
+
+The transmission can be simulated as a perfect communication channel using the
+_identity function_:
+
+    transmit :: String -> String
+    transmit = decode . channel . encode
+
+    channel :: [Bit] -> [Bit]
+    channel = id
+
+    transmit "this is so higher-order"
+    "this is so higher-order"
