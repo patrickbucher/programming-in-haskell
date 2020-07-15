@@ -7,10 +7,10 @@ the function twice to the value:
     twice :: (a -> a) -> a -> a
     twice f x = f (f x)
 
-    twice (*2) 3
+    > twice (*2) 3
     12
 
-    twice reverse [1,2,3]
+    > twice reverse [1,2,3]
     [1,2,3]
 
 A function that accepts another function as an argument is called a _higher
@@ -20,7 +20,8 @@ Curried functions, such as `twice`, can be applied partially, and stored for
 later use:
 
     quadruple = twice (*2)
-    quadruple 1
+
+    > quadruple 1
     4
 
 ## Processing Lists
@@ -31,20 +32,20 @@ list:
     map :: (a -> b) -> [a] -> [b]
     map f xs = [f x | x <- xs]
 
-    map (*3) [1,2,3]
+    > map (*3) [1,2,3]
     [3,6,9]
 
-    map even [1,2,3]
+    > map even [1,2,3]
     [False,True,False]
 
-    map reverse ["foo","bar","qux"]
+    > map reverse ["foo","bar","qux"]
     ["oof","rab","xuq"]
 
 Nested lists can be processed by applying `map` to itself:
 
     map (map (+1)) [[1,2,3],[4,5]]
 
-    [map (+1) [1,2,3], map (+1) [4,5]] 
+    > [map (+1) [1,2,3], map (+1) [4,5]] 
     [[2,3,4],[5,6]]
 
 `map` can also be defined recursively:
@@ -58,13 +59,13 @@ The `filter` function selects all elements of a list that satisfy a predicate:
     filter :: (a -> Bool) -> [a] -> [a]
     filter p xs = [x | x <- xs, p x]
 
-    filter even [1..10]
+    > filter even [1..10]
     [2,4,6,8,10]
 
-    filter (> 5) [1..10]
+    > filter (> 5) [1..10]
     [6,7,8,9,10]
 
-    filter (/= ' ') "abc def ghi"
+    > filter (/= ' ') "abc def ghi"
     "abcdefghi"
 
 `filter` can be defined recursively, too:
@@ -80,31 +81,31 @@ that satisfy certain criteria:
     sumsquareseven :: [Int] -> Int
     sumsquareseven xs = sum (map (^2) (filter even xs))
 
-    sumsquareseven [1..10]
+    > sumsquareseven [1..10]
     220
 
 The standard prelude defines a number of higher-order functions.
 
 `all` decides if all elements of a list satisfy a predicate:
 
-    all even [2,4,6,8]
+    > all even [2,4,6,8]
     True
 
 `any` decides if any element of a list satisfies a predicate:
 
-    any odd [2,4,6,8]
+    > any odd [2,4,6,8]
     False
 
 `takeWhile` selects elements from a list until the first element that does not
 satisfy the predicate:
 
-    takeWhile even [2,4,6,7,8]
+    > takeWhile even [2,4,6,7,8]
     [2,4,6]
 
 `dropWhile` removes elements from a list until the first element that does not
 satisfy the predicate:
 
-    dropWhile odd [1,3,5,6,7]
+    > dropWhile odd [1,3,5,6,7]
     [6,7]
 
 ## The `foldr` Function
@@ -154,7 +155,7 @@ The `foldr` function itself can be defined recursively:
     foldr f v []     = v
     foldr f v (x:xs) = f x (foldr f v xs)
 
-    foldr (+) 0 [1,2,3]
+    > foldr (+) 0 [1,2,3]
     6
 
 `foldr` can be understood as a function that replaces the `cons` operator of a
@@ -317,7 +318,6 @@ binary as follows:
 
 This expression can be restructured:
 
-
     a + (2 * b) + (4 * c) + (8 * d) | factoring out 2
     a + 2 * (b + (2 * c) + (4 * d)) | factoring out 2
     a + 2 * (b + 2 * (c + (2 * d))) | factoring out 2
@@ -351,7 +351,7 @@ gives the sequence of binary digits:
     int2bin' 0 = []
     int2bin' n = n `mod` 2 : int2bin' (n `div` 2)
 
-    int2bin 13
+    > int2bin 13
     [1,1,0,1]
 
 `make8` ensures that the sequence is always 8 bit (i.e. one byte) long:
@@ -359,7 +359,7 @@ gives the sequence of binary digits:
     make8 :: [Bit] -> [Bit]
     make8 bits = reverse (take 8 ((reverse bits) ++ repeat 0))
 
-    make8 (int2bin 25)
+    > make8 (int2bin 25)
     [0,0,0,1,1,0,0,1]
 
 These functions allow to encode strings as binary sequences:
@@ -389,7 +389,7 @@ The bitstream is first chopped up into bytes. The individual bytes are then
 converted to decimals, and the resulting code points are converted to
 characters.
 
-    decode (encode "abc")
+    > decode (encode "abc")
     "abc"
 
 The transmission can be simulated as a perfect communication channel using the
@@ -401,5 +401,138 @@ _identity function_:
     channel :: [Bit] -> [Bit]
     channel = id
 
-    transmit "this is so higher-order"
+    > transmit "this is so higher-order"
     "this is so higher-order"
+
+## Voting Algorithms
+
+### First Past the Post
+
+Each person has one vote, and the candidate with the most votes wins. The
+following votes have been cast:
+
+    votes :: [String]
+    votes = ["Red", "Blue", "Green", "Blue", "Blue", "Red"]
+
+"Blue" got three, "Red" two, and "Green" two votes, hence "Blue" is the winner.
+
+The votes of a specific candidate can be counted as follows:
+
+    count :: Eq a => a -> [a] -> Int
+    count x = length . filter (== x)
+
+    > count "Blue" votes
+    3
+
+    > count "Red" votes
+    2
+
+A list of candidates can be obtained by removing duplicates from the votes
+list:
+
+    rmdups :: Eq a => [a] -> [a]
+    rmdups [] = []
+    rmdups (x:xs) = x : filter (/= x) (rmdups xs)
+
+    > rmdups votes
+    ["Red","Blue","Green"] 
+
+Combining the `count` and `rmdups` functions using a list comprehension gives a
+list of tuples consisting of the candidate's votes and name:
+
+    import Data.List
+
+    result :: Ord a => [a] -> [(Int,a)]
+    result vs = sort [(count v vs, v) | v <- rmdups vs]
+
+The results are sorted (requires `Data.List`) increasingly by the number of
+votes.
+
+The winner of the election is the second component of the last tuple in the
+list:
+
+    winner :: Ord a => [a] -> a
+    winner = snd . last . result
+
+    > winner votes
+    "Blue"
+
+### Alternative Vote
+
+Each person can vote for multiple candidates listed in the order of their
+preference (first choice, second choice, etc.). Thus, every ballot can contain
+multiple candidates:
+
+    ballots :: [[String]]
+    ballots = [["Red", "Green"],
+               ["Blue"],
+               ["Green", "Red", "Blue"],
+               ["Blue", "Green", "Red"],
+               ["Green"]]
+
+The candidate with the smallest number of first-choice votes ‒ "Red", with only
+one first-choice vote ‒ is eliminated from _all_ ballots.
+
+    [["Green"],
+     ["Blue"],
+     ["Green", "Blue"],
+     ["Blue", "Green"],
+     ["Green"]]
+
+This process is repeated for "Blue", which has fever first-choice votes than "Green":
+
+    [["Green"],
+     [],
+     ["Green"],
+     ["Green"],
+     ["Green"]]
+
+"Green" is the only remaining candidate ‒ and hence the winner.
+
+Empty ballots can removed using `filter` and `map`:
+
+    rmempty :: Eq a => [[a]] -> [[a]]
+    rmempty = filter (/= [])
+
+    > rmempty [["Green"],[],["Green"],["Green"],["Green"]]
+    [["Green"],["Green"], ["Green"], ["Green"]]
+
+    elim :: Eq a => a -> [[a]] -> [[a]]
+    elim x = map (filter (/= x))
+
+    > elim "Red" ballots
+    [["Green"],["Blue"],["Green","Blue"],["Blue","Green"],["Green"]]
+
+Using the `result` function from before, the candidates can be ranked as
+follows:
+
+    import Data.List
+
+    count :: Eq a => a -> [a] -> Int
+    count x = length . filter (== x)
+
+    rmdups :: Eq a => [a] -> [a]
+    rmdups [] = []
+    rmdups (x:xs) = x : filter (/= x) (rmdups xs)
+
+    result :: Ord a => [a] -> [(Int,a)]
+    result vs = sort [(count v vs, v) | v <- rmdups vs]
+
+    rank :: Ord a => [[a]] -> [a]
+    rank = map snd . result . map head
+
+    > rank ballots
+    ["Red","Blue","Green"]
+
+The results of `rank` can now be discarded from the left, until only one
+element ‒ the winner ‒ remains:
+
+    winner :: Ord a => [[a]] -> a
+    winner bs = case rank (rmempty bs) of
+                    [c]    -> c
+                    (c:cs) -> winner (elim c bs)
+
+    > winner ballots
+    "Green"
+
+The `case` mechanism allows pattern matching to be used inside a function body.
