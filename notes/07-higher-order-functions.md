@@ -637,6 +637,8 @@ TODO: how's that possible? `map` and filter do `[a] -> [a]`, and `foldr` does `[
     filter f (x:xs) | f x         = [x] ++ filter f xs
                     | otherwise   = filter f xs
 
+TODO: reconsider with lambda expression
+
 Ex. 4) Using `foldl`, define a function `dec2int :: [Int] -> Int` that converts
 a decimal number into an integer. For example:
 
@@ -648,3 +650,12 @@ a decimal number into an integer. For example:
 
     dec2int :: [Int] -> Int
     dec2int xs = foldl (tenfold_plus) 0 xs
+
+TODO: reconsider with lambda expression
+
+Ex. 5) Without looking at the definitions from the standard prelude, define the
+higher-order library function `curry` that converts a function on pairs into a
+curried function, and, conversely, the function `uncurry` that converts a
+curried function with two arguments into a function on pairs.
+
+Hint: first write down the types of the two functions.
