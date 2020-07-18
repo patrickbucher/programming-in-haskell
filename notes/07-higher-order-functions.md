@@ -137,7 +137,7 @@ accepts the parameters `v` and `#` as arguments.
 
 The functions aboved can be re-defined using `foldr` as follows:
 
-    sum :: Num  a => [a] -> a
+    sum :: Num a => [a] -> a
     sum = foldr (+) 0
 
     product :: Num  a => [a] -> a
@@ -536,3 +536,115 @@ element ‒ the winner ‒ remains:
     "Green"
 
 The `case` mechanism allows pattern matching to be used inside a function body.
+
+## Exercises
+
+Ex. 1) Show how the list comprehension `[f x | x <- xs, p x]` can be
+re-expressed using the higher-order functions `map` and `filter`.
+
+    -- example implementation
+    f :: Int -> Int
+    f x = 2 * x
+
+    -- example implementation, too
+    p :: Int -> Bool
+    p x = x `mod` 2 == 0
+
+    -- example values
+    xs :: [Int]
+    xs = [1..10]
+
+    > [f x | x <- xs, p x]
+    [4,8,12,16,20]
+
+    > map f (filter p xs)
+    [4,8,12,16,20]
+
+Ex. 2) Without looking at the definitions from the standard prelude, define the
+following higher-order library functions on lists.
+
+TODO: for a.) and b.), why is it `[Bool]` and not `[a]`? Seems strange...
+
+a.) Decide if all elements of a list satisfy a predicate:
+
+    all :: (a -> Bool) -> [Bool] -> Bool
+
+    is_true :: Bool -> Bool
+    is_true x = x
+
+    all :: (a -> Bool) -> [Bool] -> Bool
+    all p []        = True
+    all p (True:xs) = all p xs
+    all p (False:_) = False
+
+    > all is_true [True,True,True]
+    True
+
+    > all is_true [True,False,True]
+    False
+
+b.) Decide if any element of a list satisfies a predicate:
+
+    any :: (a -> Bool) -> [Bool] -> Bool
+
+    is_true :: Bool -> Bool
+    is_true x = x
+
+    any :: (a -> Bool) -> [Bool] -> Bool
+    any p []         = False
+    any p (True:_)   = True
+    any p (False:xs) = any p xs
+
+    > any is_true [False,False,False]
+    False
+
+    > any is_true [False,True,False]
+    True
+
+c.) Select elements from a list while they satisfy a predicate:
+
+    takeWhile :: (a -> Bool) -> [a] -> [a]
+    takeWhile p []                 = []
+    takeWhile p (x:xs) | p x       = [x] ++ Main.takeWhile p xs
+                       | otherwise = []
+
+    > takeWhile even [2,4,6,7,8,9]
+    [2,4,6]
+
+d.) Remove elements from a list while they satisfy a predicate:
+
+    dropWhile :: (a -> Bool) -> [a] -> [a]
+    dropWhile p []                 = []
+    dropWhile p (x:xs) | p x       = Main.dropWhile p xs
+                       | otherwise = [x] ++ xs
+
+    > dropWhile even [2,4,6,7,8,9]
+    [7,8,9]
+
+Note: in the prelude the first two of these functions are generic functions
+rather than being specific to the type of lists.
+
+Ex. 3) Redefine the functions `map f` and `filter p` using `foldr`.
+
+TODO: how's that possible? `map` and filter do `[a] -> [a]`, and `foldr` does `[a] -> a`...
+
+    map :: (a -> b) -> [a] -> [b]
+    map f []     = []
+    map f (x:xs) = [f x] ++ map f xs
+
+    filter :: (a -> Bool) -> [a] -> [a]
+    filter f []                   = []
+    filter f (x:xs) | f x         = [x] ++ filter f xs
+                    | otherwise   = filter f xs
+
+Ex. 4) Using `foldl`, define a function `dec2int :: [Int] -> Int` that converts
+a decimal number into an integer. For example:
+
+    > dec2int [2,3,4,5]
+    2345
+
+    tenfold_plus :: Int -> Int -> Int
+    tenfold_plus x y = x * 10 + y
+
+    dec2int :: [Int] -> Int
+    dec2int xs = foldl (tenfold_plus) 0 xs
