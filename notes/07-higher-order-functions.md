@@ -669,4 +669,11 @@ rewritten more compactly using `unfold` as follows:
 
 Redefine the functions `chop8`, `map f` and `iterate f` using `unfold`.
 
-TODO: p. 90
+    chop8 :: [Int] -> [[Int]]
+    chop8 = unfold (== []) (take 8) (drop 8)
+
+    map :: Eq a => (a -> a) -> [a] -> [a]
+    map f = unfold (== []) (\xs -> f (head xs)) (drop 1)
+
+    iterate :: (a -> a) -> a -> [a]
+    iterate f = unfold (\_ -> False) f f
