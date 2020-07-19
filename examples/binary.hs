@@ -21,6 +21,7 @@ make8 bits = reverse (take 8 ((reverse bits) ++ repeat 0))
 
 encode :: String -> [Bit]
 encode = concat . map (make8 . int2bin . ord)
+-- TODO: add parity bit (1 for odd number of ones, 0 otherwise)
 
 chop8 :: [Bit] -> [[Bit]]
 chop8 []   = []
@@ -28,6 +29,7 @@ chop8 bits = take 8 bits : chop8 (drop 8 bits)
 
 decode :: [Bit] -> String
 decode = map (chr . bin2int) . chop8
+-- TODO: check and discard parity bit
 
 transmit :: String -> String
 transmit = decode . channel . encode
