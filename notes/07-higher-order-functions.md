@@ -737,3 +737,32 @@ modelled using the `tail` function on lists of bits.
 
     > faulty_transmit "foo"
     "\204\222*** Exception: Prelude.head: empty list
+
+Ex. 9) Define a function `altMap :: (a -> b) -> (a -> b) -> [a] -> [b]` that
+alternately applies its two argument functions to successive elements in a
+list, in turn about order. For example:
+
+    > altMap (+10) (+100) [0,1,2,3,4]
+    [10,101,12,103,14]
+
+    altMap :: (a -> b) -> (a -> b) -> [a] -> [b]
+    altMap f g []     = []
+    altMap f g (x:xs) = [f x] ++ altMap g f xs
+
+Ex. 10) Using `altMap`, define a function `luhn :: [Int] -> Bool` that
+implements the _Luhn algorithm_ from the exercises in chapter 4 for bank card
+numbers of any length. Test your new function using your own bank card.
+
+    luhn :: [Int] -> Bool
+    luhn xs = sum (altMap luhnDouble (\x -> x) xs) `mod` 10 == 0
+
+    luhnDouble :: Int -> Int
+    luhnDouble x | x * 2 > 9 = x * 2 - 9
+                 | otherwise = x * 2
+
+    > luhn [1,7,8,4]
+    True
+    > luhn [4,7,8,3]
+    False
+    > luhn [5,2,6,7,_,_,_,_,_,_,_,_,_,_,_,_] -- own credit card number, censored
+    True
