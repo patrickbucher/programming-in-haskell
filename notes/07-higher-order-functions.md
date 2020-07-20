@@ -690,4 +690,34 @@ Hint: the library function `error :: String -> a` displays the given string as
 an error message and terminates the program; the polymorphic result type
 ensures that `error` can be used in any context.
 
-TODO: p. 90
+    -- first change: add parity bit when mapping
+    encode :: String -> [Bit]
+    encode = concat . map (add_parity . make8 . int2bin . ord)
+
+    -- second change: new functions add_parity, checksum, and count
+    add_parity :: [Bit] -> [Bit]
+    add_parity xs = [x | x <- xs] ++ [checksum xs]
+
+    checksum :: [Bit] -> Bit
+    checksum xs | (count 1 xs) `mod` 2 == 0 = 0
+                | otherwise                 = 1
+
+    count :: Bit -> [Bit] -> Int
+    count x xs = sum [1 | y <- xs, y == x]
+
+    -- third change: new function to chop parity-added bytes
+    chop9 :: [Bit] -> [[Bit]]
+    chop9 [] = []
+    chop9 bits = take 9 bits : chop9 (drop 9 bits)
+
+    -- fourth change: chop nine bytes when decoding
+    decode :: [Bit] -> String
+    decode = decode_bytes . chop9
+
+    -- fifth change: filter bytes with valid parity
+    decode_bytes :: [[Bit]] -> String
+    decode_bytes = map (chr . bin2int . take 8) . filter (check_parity)
+
+    -- sixth change: new function to check for parity
+    check_parity :: [Bit] -> Bool
+    check_parity xs = checksum (take 8 xs) == head (drop 8 xs)

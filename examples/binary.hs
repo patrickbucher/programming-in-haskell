@@ -20,16 +20,34 @@ make8 :: [Bit] -> [Bit]
 make8 bits = reverse (take 8 ((reverse bits) ++ repeat 0))
 
 encode :: String -> [Bit]
-encode = concat . map (make8 . int2bin . ord)
--- TODO: add parity bit (1 for odd number of ones, 0 otherwise)
+encode = concat . map (add_parity . make8 . int2bin . ord)
+
+add_parity :: [Bit] -> [Bit]
+add_parity xs = [x | x <- xs] ++ [checksum xs]
+
+checksum :: [Bit] -> Bit
+checksum xs | (count 1 xs) `mod` 2 == 0 = 0
+            | otherwise                 = 1
+
+count :: Bit -> [Bit] -> Int
+count x xs = sum [1 | y <- xs, y == x]
 
 chop8 :: [Bit] -> [[Bit]]
 chop8 []   = []
 chop8 bits = take 8 bits : chop8 (drop 8 bits)
 
+chop9 :: [Bit] -> [[Bit]]
+chop9 [] = []
+chop9 bits = take 9 bits : chop9 (drop 9 bits)
+
 decode :: [Bit] -> String
-decode = map (chr . bin2int) . chop8
--- TODO: check and discard parity bit
+decode = decode_bytes . chop9
+
+decode_bytes :: [[Bit]] -> String
+decode_bytes = map (chr . bin2int . take 8) . filter (check_parity)
+
+check_parity :: [Bit] -> Bool
+check_parity xs = checksum (take 8 xs) == head (drop 8 xs)
 
 transmit :: String -> String
 transmit = decode . channel . encode
