@@ -721,3 +721,19 @@ ensures that `error` can be used in any context.
     -- sixth change: new function to check for parity
     check_parity :: [Bit] -> Bool
     check_parity xs = checksum (take 8 xs) == head (drop 8 xs)
+
+Ex. 8) Test your new string transmitter program from the previous exercise
+using a faulty communication channel that forgets the first bit, which can be
+modelled using the `tail` function on lists of bits.
+
+    faulty_transmit :: String -> String
+    faulty_transmit = decode . faulty_channel . encode
+
+    faulty_channel :: [Bit] -> [Bit]
+    faulty_channel xs = tail xs
+
+    > transmit "foo"
+    "foo"
+
+    > faulty_transmit "foo"
+    "\204\222*** Exception: Prelude.head: empty list

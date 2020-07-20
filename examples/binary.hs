@@ -54,3 +54,9 @@ transmit = decode . channel . encode
 
 channel :: [Bit] -> [Bit]
 channel = id
+
+faulty_transmit :: String -> String
+faulty_transmit = decode . faulty_channel . encode
+
+faulty_channel :: [Bit] -> [Bit]
+faulty_channel xs = tail xs
