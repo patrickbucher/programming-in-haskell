@@ -6,18 +6,62 @@ The function `double` takes an argument `x` and returns the value `x + x`:
 
     double x = x + x
 
-    double 2
+    > double 2
     4
 
-    double (double 2)
+    > double (double 2)
     8
 
 Build the sum of a list from `1` to `n`:
 
     sum [1..n]
 
-    sum [1..3]
+    > sum [1..3]
     6
+
+## Features of Haskell
+
+- _Concise Programs_ due to high-level nature of functional style and few
+  keywords
+- _Powerful Type System_ that can detect a lot of errors with little type
+  information and type inference
+- _List Comprehensions_ to costruct new lists on the basis of existing lists
+- _Recursive Functions_ to provide simple and natural definitions
+- _Higher-order Functions_ that accept functions as parameters, and return
+  functions as results
+- _Effectful Functions_ to program with side-effects without compromising
+  function purity
+- _Generic Functions_ to allow functions to be applied for different types
+- _Lazy Evaluation_ to only compute results when they are needed
+- _Equational Reasoning_ for proving properties of programs
+
+## Historical Background
+
+- 1930s: _Lambda Calculus_ Alonzo Church
+    - mathematical theory of functions
+- 1950s: _LISP_ ("LISt Processor") by John McCarthy
+    - first functional programming language
+    - with variable assignments
+- 1960s: _ISWIM_ ("If you See What I Mean") by Peter Landin
+    - first pure functional programming language
+    - no variable assignments
+- 1970s
+    - _FP_ ("Functional Programming") by John Backus
+        - higher-order functions
+    - _ML_ ("Meta-Language") by Robin Milner
+        - polymorphic types
+        - type inference
+- 1970s and 1980s: _Miranda_ ("admirable") by David Turner
+    - commercial language
+    - lazy programming
+- 1987: development of _Haskell_ initiated by a committee of researchers
+    - named after Haskell Curry
+- 1990s: type classes and monads by Philip Wadler et. al.
+- 2003: publication of the _Haskell Report_ by the Haskell committee
+    - stable version of the language
+- 2010: revised and updated _Haskell Report_
+
+## Examples
 
 Definition of the `sum` function:
 
@@ -33,7 +77,7 @@ The `sum` function has a type definition:
 - `[a]` is a list of elements of the numeric type `a`
 - `a` is the resulting type of the function
 
-Sum is a function that takes a type parameter `a` and a list of `a`s as a
+`sum` is a function that takes a type parameter `a` and a list of `a`s as a
 function parameter, and returns a value of type `a`.
 
 The function `qsort` sorts a list by applying the quick sort algorithm to it:
