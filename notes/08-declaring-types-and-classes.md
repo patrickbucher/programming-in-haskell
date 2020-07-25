@@ -165,4 +165,73 @@ A parameterised list type can be created using the `data` mechanism:
 
     data List a = Nil | Cons a (List a)
 
-TODO: p. 97 ff.
+The list is either empty (`Nil`) or of th eform `Cons x xs` with `x :: a` and
+`xs :: List a`.
+
+A `len` function for this type an be implemented as follows:
+
+    len :: List a -> Int
+    len Nil         = 0
+    len (Cons _ xs) = 1 + len xs
+
+Binary trees can be expressed with this `Tree` type:
+
+    data Tree a = Leaf a | Node (Tree a) a (Tree a)
+
+Each tree element is either a Leaf (with just a value), or a Node, with another
+element to the left and right ‒ and a value in the middle.
+
+A tree can be build as follows:
+
+    t :: Tree Int
+    t = Node (Node Leaf 1) 3 (Leaf 4)) 5
+             (Node Leaf 6) 7 (Leaf 9))
+
+Which represents the following binary tree:
+
+        5
+       / \
+      3   7
+     / \ / \
+    1  4 6  9
+
+The `occurs` function checks whether or not a value exists in a tree:
+
+    occurs :: Eq a => a -> Tree a -> Bool
+    occurs x (Leaf y)     = x == y
+    occurs x (Node l y r) = x == y || occurs x l || occurs x r
+
+A value is either found in a leaf, in the middle of a node, or in either the
+left or right subtree of a given node.
+
+A tree can be flattened into a list:
+
+    flatten :: Tree a -> [a]
+    flatten (Leaf x)     = [x]
+    flatten (Node l x r) = flatten l ++ [x] ++ flatten r
+
+Since the values in the tree are sorted from left to right, the resulting list
+of `flatten` is also sorted. Such a tree is called a _search tree_. The
+`occurs` function can be optimized for search trees by only looking into the
+subtree that possibly can contain a value:
+
+    occurs :: Ord a => a -> Tree a -> Bool
+    occurs x (Leaf y)
+    occurs x (Node l y r) | x == y    = True
+                          | x < y     = occurs x l
+                          | otherwise = occurs x r
+
+Alternative tree definitions have only data in their nodes or leaves, data of
+different types, or lists of subtrees:
+
+    -- only data in the leaves
+    data Tree a = Leaf a | Node (Tree a) (Tree a)
+
+    -- only data in the nodes
+    data Tree a = Leaf | Node (Tree a) a (Tree a)
+
+    -- different types in leaves and nodes
+    data Tree a b = Leaf a | Node (Tree a b) b (Tree a b)
+
+    -- list of subtrees:
+    data Tree a = Node a [Tree a]
