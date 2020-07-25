@@ -235,3 +235,100 @@ different types, or lists of subtrees:
 
     -- list of subtrees:
     data Tree a = Node a [Tree a]
+
+## Classes
+
+A class can be defined using the `class` mechanism:
+
+    class Eq a where
+        (==), (/=) :: a -> a -> Bool
+
+        x /= y = not (x == y)
+
+A type `a` is an instance of class `Eq`, if it supports the equality and
+inequality operators. For the inequality operator, a _default definition_ has
+been given, which can optionally be overwritten. New instances only need to
+define the equality operator:
+
+    instance Eq Bool where
+        False == False = True
+        True  == True  = True
+        _     == _     = False
+
+Types defined using `data` and `newtype`, but _not_ `type`, can be made into
+instances of classes.
+
+Existing classes can be extended to build new classes. Here, `Ord` is defined
+as an extension to `Eq` (for `a` to be of type `Ord`, it first must be of type
+`Eq`):
+
+    class Eq a => Ord a where
+        (<), (<=), (>), (>=) :: a -> a -> Bool
+        min, max             :: a -> a -> a
+
+        min x y | x <= y    = x
+                | otherwise = y
+
+        max x y | x <= y    = y
+                | otherwise = x
+
+`Bool` can be implemented as an instance of `Ord` (and, implicitly, `Eq`):
+
+    instance Ord Bool where
+        False < True = True
+        _     < _    = False
+
+        b <= c = (b < c) || (b == c)
+        b > c  = c < b
+        b >= c = c <= b
+
+### Derived Instances
+
+New types can be made into instances of existing classes using the `deriving`
+mechenism:
+
+    data Bool = False | True
+                deriving (Eq, Ord, Show, Read)
+
+This new type automatically supports the functions of the derived types:
+
+    -- Eq
+    > False == False
+    True
+
+    -- Ord
+    > False < True
+    True
+
+    -- Show
+    > show False
+    "False"
+
+    -- Read
+    > read "False" :: Bool
+    False
+
+`Ord` uses the position of `False` and `True` as stated in the definition for
+its operators.
+
+Read needs additional type information in order to know which type is to be
+created, which cannot be inferred automatically.
+
+The types of arguments must also be instances of the derived classes:
+
+    data Shape   = Circle Float | Rect Float Float
+
+    data Maybe a = Nothing | Just a
+
+To derive `Shape` as an equality type, `Float` must also be an equality type.
+To derive `Maybe` as an equality type, `a` must also be an equality type
+(_class constraint_).
+
+For types derived as an ordered type, values built using constructors with
+arguments are ordered lexicographically:
+
+    > Rect 1.0 4.0 < Rect 2.0 3.0
+    True
+
+    > Rect 1.0 4.0 < Rect 1.0 3.0
+    False
