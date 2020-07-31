@@ -332,3 +332,166 @@ arguments are ordered lexicographically:
 
     > Rect 1.0 4.0 < Rect 1.0 3.0
     False
+
+## Tautology Checker
+
+A _tautology_ is a proposition that is always true, no matter what the values
+of the proposition's variables are.
+
+`Prop` is a type that defines different forms of propositions, supporting the
+logical operators _not_, _and_, and _implication_:
+
+    data Prop = Const Bool
+              | Var Char
+              | Not Prop
+              | And Prop Prop
+              | Imply Prop Prop
+
+Propositions can be defined as follows:
+
+    p1 :: Prop
+    p1 = And (Var 'A') (Not (Var 'A'))
+    -- A and not A
+
+    p2 :: Prop
+    p2 = Imply (And (Var 'A') (Var 'B')) (Var 'A')
+    -- (A and B) => A
+
+    p3 :: Prop
+    p3 = Imply (Var 'A') (And (Var 'A') (Var 'B'))
+    -- A => (A and B)
+
+    p4 :: Prop
+    p4 = Imply (And (Var 'A') (Imply (Var 'A') (Var 'B'))) (Var 'B')
+    -- (A and (A => B)) => B
+
+`Subst` can be used to substitute variable names with boolean expressions:
+
+    type Assoc k v = [(k,v)]
+    type Subst = Assoc Char Bool
+
+The following expression is a substitution that assigns the truth value `False`
+to variable `A`, and `True` to variable `B`:
+
+    [('A',False),('B',True)]
+
+The `eval` function evaluates a proposition using such a substitution ‒ and a
+slightly modified `find` function from chapter 5:
+
+    find :: Eq a => a -> [(a,b)] -> b
+    find k t = head [v | (k',v) <- t, k == k']
+
+    eval :: Subst -> Prop -> Bool
+    eval _ (Const b)   = b
+    eval s (Var x)     = find x s
+    eval s (Not p)     = not (eval s p)
+    eval s (And p q)   = eval s p && eval s q
+    eval s (Imply p q) = eval s p <= eval s q
+
+The evaluation rules work as follows:
+
+1. A constant expression evaluates to the constant itself.
+2. A variable expression can be looked up using the substitutions.
+3. A not expression is evaluated as the negation of that expression.
+4. An and expression is evaluated by evaluation both variables using the substitutions.
+5. An implication is implemented using a trick:
+    - Since `False <= True`, and _ex falso quod libet_, the expression is
+      `True` if the left hand value is `False`.
+    - If the left hand value is `True`, the right hand value must also be
+      `True`, or the expression evaluates to `False`.
+
+To check if a proposition is a tautology, all possible substitutions for a
+variable need to be considered. To do that, a list of all variables in a
+proposition needs to be extracted:
+
+    vars :: Prop -> [Char]
+    vars (Const _)   = []
+    vars (Var x)     = [x]
+    vars (Not p)     = vars p
+    vars (And p q)   = vars p ++ vars q
+    vars (Imply p q) = vars p ++ vars q
+
+The function `bools` takes a number of variables as argument and produces all
+possible permutations of the variables `True` and `False`:
+
+    > bools 3
+    [[False, False, False],
+     [False, False, True],
+     [False, True, False],
+     [False, True, True],
+     [True, False, False],
+     [True, False, True],
+     [True, True, False],
+     [True, True, True]]
+
+A list of all possible substitutions for `n` variables can be computed by
+interpreting a substitution as a binary number of length `n` with `False` as
+`0` and `True` as `1`:
+
+    > bools 3
+    [[False, False, False], -- 000
+     [False, False, True],  -- 001
+     [False, True, False],  -- 010
+     [False, True, True],   -- 011
+     [True, False, False],  -- 100
+     [True, False, True],   -- 101
+     [True, True, False],   -- 110
+     [True, True, True]]    -- 111
+
+The `bools` function can be implemented as follows:
+
+    bools :: Int -> [[Bool]]
+    bools 0 = [[]]
+    bools n = map (False:) bss ++ map (True:) bss
+              where bss = bools (n-1)
+
+A result of size `n` is simply the result of size `n-1`, with once `True` and
+once `False` added in front of every element.
+
+The `substs` function, which generates all possible substitutions for a
+proposition, can be implemented using the `rmdups` function from chapter 7:
+
+    rmdups :: Eq a => [a] -> [a]
+    rmdups [] = []
+    rmdups (x:xs) = x : filter (/= x) (rmdups xs)
+
+    substs :: Prop -> [Subst]
+    substs p = map (zip vs) (bools (length vs))
+               where vs = rmdups (vars p)
+
+The unique variables in the given proposition are mapped to all possible
+permutations of boolean values. The function can be used as follows:
+
+    > p1 = And (Var 'A') (Not (Var 'A'))
+    > substs p1
+    [[('A',False)],
+     [('A',True)]]
+
+    > p2 = Imply (And (Var 'A') (Var 'B')) (Var 'A')
+    > substs p2
+    [[('A',False),('B',False)],
+     [('A',False),('B',True)],
+     [('A',True),('B',False)],
+     [('A',True),('B',True)]]
+
+If all variables in the substitution list of a proposition evaluate to `True`,
+then the proposition is a tautology:
+
+    isTaut :: Prop -> Bool
+    isTaut p = and [eval s p | s <- substs p]
+
+    > p1 = And (Var 'A') (Not (Var 'A'))
+    > isTaut p1
+    False
+
+    > p2 = Imply (And (Var 'A') (Var 'B')) (Var 'A')
+    > isTaut p2
+    True
+
+    > p3 = Imply (Var 'A') (And (Var 'A') (Var 'B'))
+    > isTaut p3
+    False
+
+    > isTaut p4
+    > p4 = Imply (And (Var 'A') (Imply (Var 'A') (Var 'B'))) (Var 'B')
+    True
