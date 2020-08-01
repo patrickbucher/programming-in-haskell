@@ -495,3 +495,90 @@ then the proposition is a tautology:
     > isTaut p4
     > p4 = Imply (And (Var 'A') (Imply (Var 'A') (Var 'B'))) (Var 'B')
     True
+
+## Abstract Machine
+
+The type `Expr` represents either an integer, or an addition operation of two
+other integers:
+
+    data Expr = Val Int | Add Expr Expr
+
+The `value` function evaluates such an expression:
+
+    value :: Expr -> Int
+    value (Val n)   = n
+    value (Add x y) = value x + value y
+
+Example:
+
+    value (Add (Val 7) (Add (Val 2) (Val 5)))
+    value (Val 7) + (Add (Val 2) (Val 5))
+    7 + (value (Val 2) + value (Val 5))
+    7 + (2 + 5)
+    7 + 7
+    14
+
+The order of evaluation is determined by Haskell. In order to make the
+evaluation order explicit, an _abstract machine_ can be defined.
+
+A _control stack_ is a list of operations to be performed after an avaluation
+has been completed:
+
+    type Cont = [Op]
+
+    data Op = EVAL Expr | ADD Int
+
+An expression in the context of a control stack is evaluated as follows:
+
+    eval :: Expr -> Cont -> Int
+    eval (Val n) c   = exec c n
+    eval (Add x y) c = eval x (EVAL y : c)
+
+For an integer (`Val n`) expression, the control stack is executed.
+
+For an addition (`Add x y`) expression, the first argument (`x`) is evaluated,
+and the second argument (`y`) is put on the control stack for evaluation.
+
+The control stack is executed using the `exec` function:
+
+    exec :: Cont -> Int -> Int
+    exec [] n           = n
+    exec (EVAL y : c) n = eval y (ADD n : c)
+    exec (ADD n : c) m  = exec c (n+m)
+
+For an empty control stack, the integer argument is returned.
+
+If an evaluation operation (`EVAL`) is on top of the stack, it is evaluated by
+placing the according `ADD` operation on top of the stack.
+
+If an addition operation (`ADD`) is on top of the stack, the remaining control
+stack is executed with the sum of the argument `m` and `n` from the top of the
+stack.
+
+An integer expression is evaluated using this `value` function:
+
+    value :: Expr -> Int
+    value e = eval e []
+
+Notice that the functions `exec` and `value` use _mutual recursion_!
+
+Now an expression is evaluated as follows:
+
+    value (Add (Add (Val 1) (Val 2)) (Val 3))
+    eval (Add (Add (Val 1) (Val 2)) (Val 3)) []
+    eval (Add (Val 1) (Val 2)) [EVAL (Val 3)]
+    eval (Val 1) [EVAL (Val 2), [EVAL (Val 3)]
+    exec [EVAL (Val 2), EVAL (Val 3)] 1
+    eval (Val 2) [ADD 1, EVAL (Val 3)]
+    exec [ADD 1, EVAL (Val 3)] 2
+    exec [EVAL (Val 3)] (1 + 2)
+    exec [EVAL (Val 3)] 3
+    eval (Val 3) [ADD 3]
+    exec [ADD 3] 3
+    exec [] (3 + 3)
+    exec [] 6
+    6
+
+## Exercises
+
+TODO: p. 109 ff.
