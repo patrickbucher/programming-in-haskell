@@ -184,8 +184,8 @@ element to the left and right ‒ and a value in the middle.
 A tree can be build as follows:
 
     t :: Tree Int
-    t = Node (Node Leaf 1) 3 (Leaf 4)) 5
-             (Node Leaf 6) 7 (Leaf 9))
+    t = Node (Node (Leaf 1) 3 (Leaf 4)) 5
+             (Node (Leaf 6) 7 (Leaf 9))
 
 Which represents the following binary tree:
 
@@ -609,5 +609,65 @@ natural numbers: Hint: make use of `add` in your definition.
 
     > nat2int (mult (int2nat 7) (int2nat 8))
     56
+
+Ex. 2) Although not included in appendix B, the standard prelude defines
+
+    data Ordering = LT | EQ | GT
+
+together with a function
+
+    compare :: Ord a => a -> a -> Ordering
+
+that decides if one value in an ordered type is less than (`LT`), equal to
+(`EQ`), or greater than (`GT`) another value. Using this function, redefine the
+function `occurs :: Ord a => a -> Tree a -> Bool` for search trees. Why is this
+new definition more efficient than the original version?
+
+    occurs :: Ord a => a -> Tree a -> Bool
+    occurs x (Leaf y)     = x == y
+    occurs x (Node l y r) | compare x y == EQ = True
+                          | compare x y == LT = occurs x l
+                          | compare x y == GT = occurs x r
+
+The new definition is more efficient, because values are only looked up in the
+side of the three where they could possibly occur (smaller values in the left
+hand side, bigger values in the right hand side).
+
+Ex. 3) Consider the following type of binary trees:
+
+    data Tree a = Leaf a | Node (Tree a) (Tree a)
+
+Let us say that such a tree is _balanced_ if the number of leaves in the left
+and right subtree of every node differs by at most one, with leaves themselves
+being trivially balanced. Define a function `balanced :: Tree a -> Bool` that
+decides if a binary tree is balanced or not.
+
+Hint: first define a function that returns the number of leaves in a tree.
+
+    t1 :: Tree Int
+    t1 = Node (Node (Leaf 3) (Leaf 3))
+              (Node (Node (Leaf 5) (Leaf 7)) (Leaf 1))
+
+    t2 :: Tree Int
+    t2 = Node (Node (Leaf 3) (Leaf 3))
+              (Node (Node (Leaf 5) (Leaf 7)) (Node (Leaf 1) (Leaf 2)))
+
+    balanced :: Tree a -> Bool
+    balanced (Leaf _)   = True
+    balanced (Node l r) = abs ((leaves l) - (leaves r)) <= 1
+
+    leaves :: Tree a -> Int
+    leaves (Leaf _)   = 1
+    leaves (Node l r) = (leaves l) + (leaves r)
+
+    > leaves t1
+    5
+    > balanced t1
+    True
+
+    > leaves t2
+    6
+    > balanced t2
+    False
 
 TODO: p. 109 ff.
