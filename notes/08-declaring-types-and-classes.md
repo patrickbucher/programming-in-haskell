@@ -691,4 +691,56 @@ into two halves whose length differs by at most one.
                         x = head ys
                         y = head (reverse ys)
 
+Ex. 5) Given the type declaration
+
+    data Expr = Val Int | Add Expr Expr
+
+define a higher-order function
+
+    folde :: (Int -> a) -> (a -> a -> a) -> Expr -> a
+
+such that `folde f g` replaces each `Val` constructor in an expression by the
+function `f`, and each `Add` constructor by the function `g`.
+
+    data Expr = Val Int | Add Expr Expr
+
+    folde :: (Int -> a) -> (a -> a -> a) -> Expr -> a
+    folde f _ (Val i)   = f i
+    folde f g (Add x y) = g (folde f g x) (folde f g y)
+
+Ex. 6) Using `folde`, define a function `eval :: Expr -> Int` that evaluates an
+expression to an integer value, and a function `size :: Expr -> Int` that
+calculates the number of values in an expression.
+
+    eval :: Expr -> Int
+    eval (Val i)   = i
+    eval (Add x y) = eval x + eval y
+
+    size :: Expr -> Int
+    size (Val i)   = 1
+    size (Add x y) = size x + size y
+
+    e0 = (Val 1)
+    e1 = (Add (Val 1) (Val 2))
+    e2 = (Add (Val 1) (Add (Val 2) (Val 3)))
+    e3 = (Add (Add (Val 1) (Val 2)) (Add (Val 3) (Val 4)))
+
+    > size e0
+    1
+    > size e1
+    2
+    > size e2
+    3
+    > size e3
+    4
+
+    > eval e0
+    1
+    > eval e1
+    3
+    > eval e2
+    6
+    > eval e3
+    10
+
 TODO: p. 109 ff.
