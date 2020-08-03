@@ -670,4 +670,25 @@ Hint: first define a function that returns the number of leaves in a tree.
     > balanced t2
     False
 
+Ex. 4) Define a function `balance :: [a] -> Tree a` that converts a non-empty
+list into a balanced tree. Hint: first define a function that splits a list
+into two halves whose length differs by at most one.
+
+    -- extended definition (Void) for empty trees
+    data Tree a = Void | Leaf a | Node (Tree a) (Tree a) deriving Show
+
+    halves :: [a] -> [[a]]
+    halves xs = [take n xs, drop n xs]
+                  where l = length xs
+                        m = l `div` 2
+                        n = l - m
+
+    balance :: [a] -> Tree a
+    balance []  = Void 
+    balance [x] = Leaf x
+    balance xs  = Node (balance x) (balance y)
+                  where ys = halves xs
+                        x = head ys
+                        y = head (reverse ys)
+
 TODO: p. 109 ff.
