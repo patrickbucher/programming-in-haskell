@@ -743,4 +743,25 @@ calculates the number of values in an expression.
     > eval e3
     10
 
-TODO: p. 109 ff.
+Ex. 7) Complete the following instance declarations:
+
+    instance Eq a => Eq (Maybe a) where
+    ...
+
+    instance Eq a => Eq [a] where
+    ...
+
+    data Maybe a = Nothing | Just a
+
+    instance Eq a => Eq (Maybe a) where
+        Nothing == Nothing = True
+        Just a  == Just b  = a == b
+        _       == _       = False
+
+    instance Eq a => Eq [a] where
+        []     == []     = True
+        [x]    == [y]    = x == y
+        (x:xs) == (y:ys) = x == y && xs == ys
+        _      == _      = False
+
+TODO: p. 110 ff.
