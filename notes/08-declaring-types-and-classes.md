@@ -764,4 +764,58 @@ Ex. 7) Complete the following instance declarations:
         (x:xs) == (y:ys) = x == y && xs == ys
         _      == _      = False
 
-TODO: p. 110 ff.
+Ex. 8) Extend the tautology checker to support the use of logical disjunction
+(∨) and equivalence (≍) in propositions.
+
+    data Prop = Const Bool
+              -- ...
+              | Or Prop Prop
+              | Equiv Prop Prop
+
+
+    eval :: Subst -> Prop -> Bool
+    -- ...
+    eval s (Or p q)    = eval s p || eval s q
+    eval s (Equiv p q) = eval s p == eval s q
+
+    vars :: Prop -> [Char]
+    -- ...
+    vars (Or p q)    = vars p ++ vars q
+    vars (Equiv p q) = vars p ++ vars q
+
+    > p1 = Or (Var 'A') (Var 'B')
+    > isTaut p1
+    False
+
+    > p2 = Or (Var 'A') (Not (Var 'A'))
+    > isTaut p2
+    True
+
+    > p3 = Equiv (Var 'A') (Var 'B')
+    > isTaut p3
+    False
+
+    > p4 = Equiv (Var 'A') (Var 'A')
+    > isTaut p4
+    True
+
+Ex. 9) Extend the abstract machine to support the use of multiplication.
+
+    data Expr = Val Int | Add Expr Expr | Mul Expr Expr
+
+    data Op = EVAL_P Expr | EVAL_M Expr | ADD Int | MUL Int
+
+    eval :: Expr -> Cont -> Int
+    -- ...
+    eval (Add x y) c = eval x (EVAL_P y : c)
+    eval (Mul x y) c = eval x (EVAL_M y : c)
+
+    exec :: Cont -> Int -> Int
+    -- ...
+    exec (EVAL_P y : c) n = eval y (ADD n : c)
+    exec (EVAL_M y : c) n = eval y (MUL n : c)
+    exec (ADD n : c) m  = exec c (n+m)
+    exec (MUL n : c) m  = exec c (n*m)
+
+    > value (Mul (Add (Val 1) (Val 3)) (Mul (Val 3) (Val 6))) -- (1+3)*(3*6)
+    54
