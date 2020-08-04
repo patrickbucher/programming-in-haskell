@@ -1,3 +1,6 @@
+module Board (Grid, Row, Col, Stone,
+              new_grid, is_valid_move, apply_move, is_win) where
+
 type Grid = [Row]
 type Row = [Int]
 type Col = [Int]
@@ -84,15 +87,6 @@ fmt_stone :: Int -> Char
 fmt_stone 0 = '-'
 fmt_stone 1 = 'x'
 fmt_stone 2 = 'o'
-
--- demo data
-g0 :: Grid
-g0 = [[2,2,1,1,1,2,1],
-      [2,1,2,1,2,1,2],
-      [1,2,2,1,1,2,1],
-      [2,1,1,2,2,1,2],
-      [2,2,1,1,1,2,2],
-      [1,2,1,1,2,1,1]]
 
 -- common functions
 get_column :: Grid -> Int -> Col
