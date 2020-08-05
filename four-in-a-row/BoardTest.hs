@@ -85,24 +85,19 @@ test_apply_move_2_2 = TestCase (assertEqual "apply_move" (apply_move grid_move_1
 test_apply_move_6_1 = TestCase (assertEqual "apply_move" (apply_move grid_move_2_2 6 1) grid_move_6_1)
 test_apply_move_4_2 = TestCase (assertEqual "apply_move" (apply_move grid_move_6_1 4 2) grid_move_4_2)
 
-win_grid = [[1,1,0,1,0,1,1],
-            [0,0,0,1,0,0,2],
-            [0,2,1,1,2,0,1],
-            [0,1,2,1,2,0,2],
-            [1,0,0,2,2,0,2],
-            [1,1,1,1,2,0,2]]
+win_grid = [[0,2,0,0,0,0,0],
+            [0,2,0,0,0,0,0],
+            [0,2,0,2,0,0,0],
+            [0,2,1,1,2,0,0],
+            [0,1,2,2,1,2,0],
+            [1,2,1,1,1,1,2]]
 
-test_win_5_0_p1 = TestCase (assertBool "is_win" (is_win win_grid 5 0 1))
-test_win_4_0_p1 = TestCase (assertBool "is_win" (is_win win_grid 4 0 1))
-test_win_5_4_p2 = TestCase (assertBool "is_win" (is_win win_grid 5 4 2))
-test_win_2_1_p2 = TestCase (assertBool "is_win" (is_win win_grid 2 1 2))
-test_win_0_3_p1 = TestCase (assertBool "is_win" (is_win win_grid 0 3 1))
-test_not_win_2_2_p1 = TestCase (assertEqual "is_win" (is_win win_grid 2 2 1) False)
-test_not_win_2_4_p1 = TestCase (assertEqual "is_win" (is_win win_grid 2 4 1) False)
-test_not_win_4_5_p1 = TestCase (assertEqual "is_win" (is_win win_grid 4 5 1) False)
-test_not_win_2_2_p2 = TestCase (assertEqual "is_win" (is_win win_grid 2 2 2) False)
-test_not_win_5_6_p2 = TestCase (assertEqual "is_win" (is_win win_grid 5 6 2) False)
-test_not_win_0_3_p2 = TestCase (assertEqual "is_win" (is_win win_grid 0 3 2) False)
+test_win_col0_p1 = TestCase (assertBool "is_win" (is_win win_grid 0 1))
+test_win_col1_p2 = TestCase (assertBool "is_win" (is_win win_grid 1 2))
+test_win_col3_p2 = TestCase (assertBool "is_win" (is_win win_grid 3 2))
+test_no_win_col1_p1 = TestCase (assertEqual "is_win" (is_win win_grid 1 1) False)
+test_no_win_col2_p2 = TestCase (assertEqual "is_win" (is_win win_grid 2 2) False)
+test_no_win_col3_p1 = TestCase (assertEqual "is_win" (is_win win_grid 3 1) False)
 
 tests = TestList [TestLabel "testGrid00" test_new_grid_00,
                   TestLabel "testGrid11" test_new_grid_11,
@@ -123,17 +118,12 @@ tests = TestList [TestLabel "testGrid00" test_new_grid_00,
                   TestLabel "testApplyMove22" test_apply_move_2_2,
                   TestLabel "testApplyMove61" test_apply_move_6_1,
                   TestLabel "testApplyMove42" test_apply_move_4_2,
-                  TestLabel "testWin50p1" test_win_5_0_p1,
-                  TestLabel "testWin40p1" test_win_4_0_p1,
-                  TestLabel "testWin54p2" test_win_5_4_p2,
-                  TestLabel "testWin21p2" test_win_2_1_p2,
-                  TestLabel "testWin03p1" test_win_0_3_p1,
-                  TestLabel "testNotWin22p1" test_not_win_2_2_p1,
-                  TestLabel "testNotWin24p1" test_not_win_2_4_p1,
-                  TestLabel "testNotWin45p1" test_not_win_4_5_p1,
-                  TestLabel "testNotWin22p2" test_not_win_2_2_p2,
-                  TestLabel "testNotWin56p2" test_not_win_5_6_p2,
-                  TestLabel "testNotWin03p2" test_not_win_0_3_p2]
+                  TestLabel "testWinCol0P1" test_win_col0_p1,
+                  TestLabel "testWinCol1P2" test_win_col1_p2,
+                  TestLabel "testWinCol3P2" test_win_col3_p2,
+                  TestLabel "testNoWinCol1P1" test_no_win_col1_p1,
+                  TestLabel "testNoWinCol2P2" test_no_win_col2_p2,
+                  TestLabel "testNoWinCol3P1" test_no_win_col3_p1]
 
 main :: IO ()
 main = do
