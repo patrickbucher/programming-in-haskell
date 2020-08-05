@@ -61,22 +61,26 @@ diagonal_win g r c p = contained fiar (diag_asc g r c) ||
                          fiar = [p | _ <- [1..4]]
 
 diag_asc :: Grid -> Int -> Int -> [Int]
-diag_asc g r c = [g !! i !! j | (i,j) <- zip (reverse [0..max_row]) [min_col..cols-1]]
+diag_asc g r c = [g !! i !! j | (i,j) <- zip rows cols]
                  where
+                   nrows   = length g
+                   ncols   = length (g !! 0)
+                   offset  = max (min (nrows - r - 1) (ncols - c - 1)) 0
                    max_row = r + offset
                    min_col = c - offset
-                   offset  = max (min (rows - r - 1) (cols - c - 1)) 0
-                   rows    = length g
-                   cols    = length (g !! 0)
+                   rows    = reverse [0..max_row]
+                   cols    = [min_col..ncols-1]
 
 diag_desc :: Grid -> Int -> Int -> [Int]
-diag_desc g r c = [g !! i !! j | (i,j) <- zip [min_row..rows-1] [min_col..cols-1]]
+diag_desc g r c = [g !! i !! j | (i,j) <- zip rows cols]
                   where
+                    offset  = min r c
                     min_row = r - offset
                     min_col = c - offset
-                    offset  = min r c
-                    rows    = length g
-                    cols    = length (g !! 0)
+                    nrows   = length g
+                    ncols   = length (g !! 0)
+                    rows    = [min_row..nrows-1]
+                    cols    = [min_col..ncols-1]
 
 top_most :: Grid -> Stone -> Int -> Int
 top_most g v c = length (takeWhile (\x -> x /= v) col)
@@ -111,3 +115,11 @@ contained (x:xs) (y:ys) | x == y    = and [x == y | (x,y) <- zip xs ys]
                                       && length xs <= length ys
                                       || contained (x:xs) ys
                         | otherwise = contained (x:xs) ys
+
+win_grid :: Grid
+win_grid = [[0,2,0,0,0,0,0],
+            [0,2,0,0,0,0,0],
+            [0,2,0,2,0,0,0],
+            [0,2,1,1,2,0,0],
+            [0,1,2,2,1,2,0],
+            [1,2,1,1,1,1,2]]
