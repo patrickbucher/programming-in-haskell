@@ -37,10 +37,12 @@ bottom_most g v c = length (takeWhile (\x -> x == v) col) - 1
                       col = get_column g c
 
 -- 4. Detecting a Win
-is_win :: Grid -> Int -> Int -> Stone -> Bool
-is_win g r c p = horizontal_win g r p ||
-                 vertical_win g c p ||
-                 diagonal_win g r c p
+is_win :: Grid -> Int -> Stone -> Bool
+is_win g c p = horizontal_win g row p ||
+               vertical_win g c p ||
+               diagonal_win g row c p
+               where
+                 row = top_most g p c
 
 horizontal_win :: Grid -> Int -> Stone -> Bool
 horizontal_win g r p = contained fiar (g !! r)
@@ -63,7 +65,7 @@ diag_asc g r c = [g !! i !! j | (i,j) <- zip (reverse [0..max_row]) [min_col..co
                  where
                    max_row = r + offset
                    min_col = c - offset
-                   offset  = min (min (rows - r - 1) (cols - c - 1)) 0
+                   offset  = max (min (rows - r - 1) (cols - c - 1)) 0
                    rows    = length g
                    cols    = length (g !! 0)
 
@@ -75,6 +77,11 @@ diag_desc g r c = [g !! i !! j | (i,j) <- zip [min_row..rows-1] [min_col..cols-1
                     offset  = min r c
                     rows    = length g
                     cols    = length (g !! 0)
+
+top_most :: Grid -> Stone -> Int -> Int
+top_most g v c = length (takeWhile (\x -> x /= v) col)
+                 where
+                   col = get_column g c
 
 -- 5. Formatting the Grid
 fmt_grid :: Grid -> String
